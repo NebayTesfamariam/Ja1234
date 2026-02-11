@@ -137,12 +137,23 @@ try {
     // Production: Use TCP/IP connection (port 3306)
     $conn = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, 3306);
   } else {
-    // Development: Try socket first (XAMPP default), then TCP/IP
-    $socket_path = "/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock";
-    if (file_exists($socket_path)) {
-      $conn = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, null, $socket_path);
+    // Development: Try socket first (XAMPP/macOS or Linux), then TCP/IP
+    $socket_paths = [
+      "/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock", // XAMPP macOS
+      "/var/run/mysqld/mysqld.sock",                         // Linux
+      "/tmp/mysql.sock",                                     // Some Linux/macOS
+    ];
+    $socket_found = null;
+    foreach ($socket_paths as $path) {
+      if (file_exists($path)) {
+        $socket_found = $path;
+        break;
+      }
+    }
+    if ($socket_found) {
+      $conn = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, null, $socket_found);
     } else {
-      // Fallback to TCP/IP connection
+      // Fallback to TCP/IP (works on Windows, WSL, and when socket not found)
       $conn = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
     }
   }

@@ -1,0 +1,65 @@
+# macOS
+__MACOSX/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-*
+
+# PHP
+vendor/
+composer.lock
+composer.phar
+*.log
+.phpunit.result.cache
+phpunit.xml
+
+# Environment and secrets (never commit real credentials)
+.env
+.env.local
+.env.*.local
+config_production.php
+
+# Logs and runtime
+logs/*.log
+44/logs/*.log
+*.log
+
+# Cache
+cache/
+*.cache
+
+# Optional: uncomment if you don't want to track zip archives
+# *.zip
+
+# Python (used by DNS scripts in 44/)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+*.egg-info/
+.eggs/
+
+# Backup and temp
+*.bak
+*.backup
+*.old
+*.tmp
+*.temp
+*.swp
+*.swo
