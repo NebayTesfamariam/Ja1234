@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Super Admin Panel</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../css/enhancements.css" />
+  <link rel="stylesheet" href="../css/admin-pro.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/notifications.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/admin-pro.js"></script>
+  <style>
+    .admin-badge { 
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white; 
+      padding: 4px 10px; 
+      border-radius: 6px; 
+      font-size: 11px; 
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+    .stats-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+      gap: 16px; 
+      margin: 24px 0; 
+    }
+    .stat-card { 
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--line-bright);
+    }
+    .stat-value { 
+      font-size: 36px; 
+      font-weight: 700; 
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 8px 0; 
+    }
+    .stat-label { 
+      color: var(--muted); 
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tabs { 
+      display: flex; 
+      gap: 8px; 
+      margin: 24px 0; 
+      border-bottom: 2px solid var(--line);
+      overflow-x: auto;
+    }
+    .tab { 
+      padding: 14px 24px; 
+      background: transparent; 
+      border: none; 
+      border-bottom: 3px solid transparent; 
+      color: var(--muted); 
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab:hover {
+      color: var(--text);
+      background: rgba(79, 125, 249, 0.05);
+    }
+    .tab.active { 
+      color: var(--text-bright);
+      border-bottom-color: var(--primary);
+      background: rgba(79, 125, 249, 0.1);
+    }
+    .tab-content { 
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active { 
+      display: block; 
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .pro-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+    .pro-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border-color: var(--line-bright);
+    }
+    .pro-card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pro-card-title {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin: 0;
+    }
+    .pro-card-body {
+      padding: 24px;
+    }
+    .btn-pro {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95em;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-pro:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .btn-pro:active {
+      transform: translateY(0);
+    }
+    .btn-pro-primary {
+      background: linear-gradient(135deg, #4f7df9 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(79, 125, 249, 0.3);
+    }
+    .btn-pro-primary:hover {
+      box-shadow: 0 4px 16px rgba(79, 125, 249, 0.4);
+    }
+    .btn-pro-secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 2px solid var(--line);
+    }
+    .btn-pro-secondary:hover {
+      border-color: var(--primary);
+      background: rgba(79, 125, 249, 0.05);
+    }
+    .btn-icon {
+      font-size: 1.1em;
+    }
+    .danger { 
+      background: var(--danger) !important;
+      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3) !important;
+    }
+    .danger:hover { 
+      background: #dc2626 !important;
+      box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4) !important;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      width: auto;
+      min-width: auto;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🔐 Super Admin Panel</h1>
+      <p class="sub">Centraal beheer voor gebruikers, devices en whitelist</p>
+    </header>
+
+    <section class="card" id="loginCard">
+      <h2>Admin Login</h2>
+      <div class="row">
+        <input id="email" placeholder="email" value="admin@test.com" />
+        <input id="password" type="password" placeholder="password" value="123456" />
+        <button id="loginBtn">Login</button>
+      </div>
+      <p class="hint" style="text-align: center; margin-top: 10px;">
+        <a href="../reset_password_request.html" style="color: var(--primary); text-decoration: none; font-size: 0.9em;">
+          🔑 Wachtwoord vergeten?
+        </a>
+      </p>
+      <p class="hint" style="text-align: center; margin-top: 10px;">
+        <a href="../superadmin_login.html" style="color: var(--danger); text-decoration: none; font-size: 0.9em; font-weight: bold;">
+          🔴 Super Admin Direct Login
+        </a>
+      </p>
+      <div id="loginMsg" class="msg"></div>
+    </section>
+
+    <section class="card hidden" id="adminCard">
+      <div class="admin-header">
+        <div>
+          <h2>📊 Professional Admin Dashboard</h2>
+          <div class="small" id="adminLine"></div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div class="system-status">
+            <span class="status-indicator active" id="systemStatus"></span>
+            <span>System Status</span>
+          </div>
+          <button id="logoutBtn" class="btn-pro btn-pro-secondary">Uitloggen</button>
+        </div>
+      </div>
+      
+      <!-- Keyboard Shortcuts Hint -->
+      <div class="keyboard-hint" id="keyboardHint">
+        <strong>⌨️ Keyboard Shortcuts:</strong><br>
+        <kbd>Ctrl/Cmd</kbd> + <kbd>K</kbd> - Search | 
+        <kbd>Ctrl/Cmd</kbd> + <kbd>N</kbd> - New Item | 
+        <kbd>1-9</kbd> - Switch Tabs | 
+        <kbd>Esc</kbd> - Close Modals
+      </div>
+
+      <div id="statsSection" class="stats-grid"></div>
+      
+      <!-- Quick Actions -->
+      <div style="background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <h3 style="margin-bottom: 15px;">⚡ Quick Actions</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+          <button class="secondary" onclick="quickAction('checkExpired')">🔄 Check Verlopen Abonnementen</button>
+          <button class="secondary" onclick="quickAction('activateAllDevices')">✅ Activeer Alle Devices</button>
+          <button class="secondary" onclick="quickAction('refreshAll')">🔄 Alles Verversen</button>
+          <button class="secondary" onclick="quickAction('exportAll')">📥 Export Alles</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
+        <button class="tab" data-tab="users">👥 Gebruikers</button>
+        <button class="tab" data-tab="devices">📱 Devices</button>
+        <button class="tab" data-tab="subscriptions">💳 Abonnementen</button>
+        <button class="tab" data-tab="payments">💵 Betalingen</button>
+        <button class="tab" data-tab="activity">📊 Activity Logs</button>
+        <button class="tab" data-tab="whitelist">✅ Whitelist</button>
+        <button class="tab" data-tab="settings">⚙️ Instellingen</button>
+        <button class="tab" data-tab="health">🏥 System Health</button>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="tabDashboard" class="tab-content active">
+        <h3>📊 Dashboard Overzicht</h3>
+        <div id="dashboardStats"></div>
+        <div id="quickActions"></div>
+        <div style="margin-top: 30px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px;">
+          <h4 style="margin-bottom: 15px;">📈 Activity Overzicht (Laatste 7 Dagen)</h4>
+          <canvas id="activityChart" style="max-height: 300px;"></canvas>
+        </div>
+      </div>
+
+      <!-- Users Tab -->
+      <div id="tabUsers" class="tab-content">
+        <h3>👥 Gebruikers Beheer</h3>
+        
+        <div class="row">
+          <input id="newUserEmail" placeholder="Email" style="flex: 1;" />
+          <input id="newUserPassword" type="password" placeholder="Wachtwoord (min. 6)" style="flex: 1;" />
+          <button id="addUserBtn" class="btn-primary">Gebruiker Toevoegen</button>
+        </div>
+        <div class="row">
+          <label style="flex: 1;"><input type="checkbox" id="newUserAdmin" /> Admin rechten</label>
+        </div>
+        <div id="userMsg" class="msg"></div>
+        
+        <div style="display: flex; gap: 10px; margin: 20px 0; align-items: center; flex-wrap: wrap;">
+          <div class="search-box" style="flex: 1; min-width: 200px;">
+            <input type="text" id="userSearch" placeholder="🔍 Zoek gebruikers..." onkeyup="filterUsers()" />
+          </div>
+          <select id="userFilterAdmin" style="flex: 0 0 150px;" onchange="filterUsers()">
+            <option value="">Alle gebruikers</option>
+            <option value="1">Alleen admins</option>
+            <option value="0">Alleen gebruikers</option>
+          </select>
+          <button id="bulkUserAction" class="secondary" style="display: none;" onclick="bulkUserAction()">Bulk Actie</button>
+          <button id="exportUsersBtn" class="secondary" onclick="exportUsers()">📥 Export</button>
+        </div>
+        
+        <div id="usersList" class="list"></div>
+      </div>
+
+      <!-- Devices Tab -->
+      <div id="tabDevices" class="tab-content">
+        <div class="pro-card">
+          <div class="pro-card-header">
+            <h3 class="pro-card-title">📱 Devices Beheer</h3>
+            <div class="pro-card-actions">
+              <button class="btn-pro btn-pro-primary" onclick="quickAddDevice()">➕ Device Toevoegen</button>
+            </div>
+          </div>
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; border: 2px solid rgba(16, 185, 129, 0.3); margin-bottom: 20px;">
+          <strong>🤖 AUTOMATISCH SYSTEEM:</strong> Alle devices werken automatisch!<br>
+          ✅ <strong>Devices via abonnement:</strong> Werken automatisch - worden automatisch geactiveerd bij actief abonnement<br>
+          ✅ <strong>Devices via admin panel:</strong> Werken automatisch - zijn altijd actief<br>
+          ❌ Devices kunnen NOOIT worden verwijderd (permanent systeem)<br>
+          🔧 <strong>Devices via abonnement:</strong> Kunnen worden gecontroleerd (blokkeren/deblokkeren) via admin panel<br>
+          🔒 <strong>Devices via admin panel:</strong> Zijn ALTIJD actief - kunnen niet worden geblokkeerd
+        </div>
+        <p class="hint" style="margin-bottom: 20px;">
+          💡 <strong>Eenvoudig blokkeren:</strong> Klik op "🚫 Blokkeren" om een device direct te blokkeren. 
+          Dit device krijgt dan geen internet toegang meer. Gebruik "✅ Deblokkeren" om toegang te herstellen.
+          Je kunt ook de status dropdown gebruiken voor meer opties.
+        </p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+          <div class="search-box" style="flex: 1; min-width: 200px;">
+            <input type="text" id="deviceSearch" placeholder="🔍 Zoek devices..." onkeyup="filterDevices()" />
+          </div>
+          <select id="deviceFilterStatus" style="flex: 0 0 150px;" onchange="filterDevices()">
+            <option value="">Alle statussen</option>
+            <option value="active">Actief</option>
+            <option value="blocked">Geblokkeerd</option>
+            <option value="inactive">Inactief</option>
+          </select>
+          <button id="bulkDeviceAction" class="secondary" style="display: none;" onclick="bulkDeviceAction()">Bulk Actie</button>
+          <button id="exportDevicesBtn" class="secondary" onclick="exportDevices()">📥 Export</button>
+        </div>
+        
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 20px; border-radius: 12px; border: 2px solid rgba(16, 185, 129, 0.3); margin-bottom: 20px;">
+          <h4 style="margin-bottom: 10px;">➕ Device Toevoegen (Super Eenvoudig - 1 Klik!)</h4>
+          <p class="hint" style="margin-bottom: 15px; background: rgba(79, 125, 249, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(79, 125, 249, 0.3);">
+            <strong>🚀 Super Eenvoudig:</strong><br>
+            ✅ Selecteer gebruiker<br>
+            ✅ Klik op "Device Toevoegen"<br>
+            ✅ Klaar! Alles wordt automatisch gegenereerd (naam, WireGuard key, IP)<br><br>
+            <strong>🔒 Permanent Device:</strong> Dit device werkt altijd, ook zonder abonnement. Kan NOOIT worden verwijderd.
+          </p>
+          <div class="row" style="margin-bottom: 10px;">
+            <select id="newDeviceUser" style="flex: 2;">
+              <option value="">👤 Selecteer gebruiker...</option>
+            </select>
+            <input id="newDeviceName" placeholder="📱 Device naam (optioneel - wordt automatisch gegenereerd)" style="flex: 2;" />
+            <button id="addDeviceBtn" class="primary" style="flex: 1; padding: 15px; font-size: 1.1em; font-weight: bold;">
+              ➕ Automatisch Device Toevoegen
+            </button>
+          </div>
+          <p class="hint" style="font-size: 0.85em; margin-top: 10px; color: var(--muted);">
+            💡 <strong>Volledig Automatisch:</strong> Alleen gebruiker selecteren, de rest wordt automatisch gegenereerd (naam, WireGuard key, IP). Device naam is optioneel - wordt automatisch gegenereerd als leeg.
+          </p>
+          <div class="row" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--line);">
+            <div style="flex: 1;">
+              <h5 style="margin-bottom: 10px; color: var(--primary);">⚡ Automatisch Device Toevoegen</h5>
+              <p class="hint" style="font-size: 0.9em; margin-bottom: 10px;">
+                ✅ <strong>Automatisch geselecteerd:</strong> De eerste gebruiker is automatisch geselecteerd!<br>
+                Klik direct op "⚡ Automatisch Toevoegen" - alles wordt automatisch gegenereerd!
+              </p>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select id="autoDeviceUser" style="flex: 2;">
+                  <option value="">👤 Selecteer gebruiker...</option>
+                </select>
+                <button id="autoAddDeviceBtn" class="primary" style="flex: 1; padding: 12px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-weight: bold;">
+                  ⚡ Automatisch Toevoegen
+                </button>
+              </div>
+              <p class="hint" style="font-size: 0.85em; color: var(--muted); margin-top: 8px;">
+                💡 <strong>Super snel:</strong> Device naam, WireGuard key en IP worden allemaal automatisch gegenereerd!
+              </p>
+            </div>
+          </div>
+          <p class="hint" style="font-size: 0.85em; color: var(--muted); margin-top: 10px;">
+            💡 <strong>Tip:</strong> Laat device naam leeg voor automatische detectie (iPhone, Android, Windows PC, etc.)<br>
+            🔧 WireGuard key en IP worden automatisch gegenereerd - geen handmatige invoer nodig!
+          </p>
+          <div id="deviceMsg" class="msg" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="pro-card" style="margin-bottom: 30px;">
+          <div class="pro-card-header">
+            <div>
+              <h3 class="pro-card-title" style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 28px;">🔗</span>
+                <span>Device Registratie Link Genereren</span>
+              </h3>
+              <p class="hint" style="margin-top: 8px; color: var(--muted); font-size: 0.9em;">
+                Genereer een veilige registratielink die gebruikers kunnen gebruiken om een device toe te voegen zonder in te loggen
+              </p>
+            </div>
+          </div>
+          
+          <div class="pro-card-body" style="padding: 24px;">
+            <div style="background: linear-gradient(135deg, rgba(79, 125, 249, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); padding: 20px; border-radius: 12px; border: 2px solid rgba(79, 125, 249, 0.2); margin-bottom: 24px;">
+              <div style="display: flex; align-items: start; gap: 12px;">
+                <div style="font-size: 32px; line-height: 1;">📧</div>
+                <div style="flex: 1;">
+                  <strong style="display: block; margin-bottom: 8px; font-size: 1.05em; color: var(--text-bright);">Stuur een link naar een gebruiker</strong>
+                  <p style="margin: 0; color: var(--muted); font-size: 0.95em; line-height: 1.6;">
+                    Perfect voor het delen via email, SMS, WhatsApp of andere kanalen.<br>
+                    Gebruikers kunnen de link gebruiken om direct een device toe te voegen zonder account nodig te hebben.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; margin-bottom: 20px; align-items: end;">
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: var(--text-bright);">👤 Gebruiker</label>
+                <select id="linkUserSelect" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--line); background: var(--card); font-size: 0.95em; transition: all 0.2s;">
+                  <option value="">Selecteer gebruiker...</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: var(--text-bright);">⏰ Geldig voor</label>
+                <input type="number" id="linkExpiresDays" placeholder="Dagen" value="7" min="1" max="365" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--line); background: var(--card); font-size: 0.95em; transition: all 0.2s;" />
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: var(--text-bright);">🔢 Max gebruik</label>
+                <input type="number" id="linkMaxUses" placeholder="Aantal" value="1" min="1" max="100" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid var(--line); background: var(--card); font-size: 0.95em; transition: all 0.2s;" />
+              </div>
+              <div>
+                <button id="generateLinkBtn" class="btn-pro btn-pro-primary" style="padding: 12px 24px; font-weight: 600; font-size: 1em; white-space: nowrap; min-width: 160px;">
+                  <span class="btn-icon">🔗</span>
+                  <span>Link Genereren</span>
+                </button>
+              </div>
+            </div>
+            
+            <div id="linkResult" style="margin-top: 20px;"></div>
+          </div>
+        </div>
+        
+        <div id="devicesList" class="list"></div>
+      </div>
+
+      <!-- Subscriptions Tab -->
+      <div id="tabSubscriptions" class="tab-content">
+        <h3>💳 Abonnementen Beheer</h3>
+        
+        <div class="row">
+          <select id="newSubUser" style="flex: 2;">
+            <option value="">Selecteer gebruiker...</option>
+          </select>
+          <select id="newSubPlan">
+            <option value="basic">Basic (2 devices) - €9.99/maand</option>
+            <option value="family">Family (5 devices) - €19.99/maand</option>
+            <option value="premium">Premium (10 devices) - €29.99/maand</option>
+          </select>
+          <input id="newSubStartDate" type="date" />
+          <input id="newSubEndDate" type="date" />
+          <button id="addSubBtn">Abonnement Toevoegen</button>
+        </div>
+        
+        <div id="subMsg" class="msg"></div>
+        
+        <h4>Actieve Abonnementen</h4>
+        <div id="subscriptionsList" class="list"></div>
+      </div>
+
+      <!-- Whitelist Tab -->
+      <div id="tabWhitelist" class="tab-content">
+        <h3>✅ Whitelist Overzicht</h3>
+        <div id="whitelistList" class="list"></div>
+      </div>
+
+      <!-- Activity Logs Tab -->
+      <div id="tabActivity" class="tab-content">
+        <h3>📊 Activity Logs & Analytics</h3>
+        <p class="hint" style="background: rgba(79, 125, 249, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(79, 125, 249, 0.3); margin-bottom: 20px;">
+          <strong>📈 Real-time Statistieken:</strong><br>
+          Bekijk alle blokkering events, gebruikersstatistieken en trends.<br>
+          Alle geblokkeerde sites worden automatisch gelogd met timestamp, device en gebruiker informatie.
+        </p>
+        
+        <!-- Blocklist stats and charts removed - whitelist-only system -->
+        
+        <div class="row" style="margin-bottom: 20px;">
+          <input id="activitySearch" placeholder="Zoek op domain, gebruiker..." style="flex: 1;" />
+          <select id="activityAction" style="flex: 0 0 150px;">
+            <option value="">Alle acties</option>
+            <option value="blocked">Geblokkeerd</option>
+            <option value="allowed">Toegestaan</option>
+          </select>
+          <input type="date" id="activityDateFrom" style="flex: 0 0 150px;" />
+          <input type="date" id="activityDateTo" style="flex: 0 0 150px;" />
+          <button id="exportActivityBtn" class="secondary">📥 Export CSV</button>
+        </div>
+        
+        <div id="activityList" class="list"></div>
+        <div id="activityPagination" style="text-align: center; margin-top: 20px;"></div>
+      </div>
+
+      <!-- Payments Tab -->
+      <div id="tabPayments" class="tab-content">
+        <h3>💵 Stripe Betalingen Beheer</h3>
+        <p class="hint" style="background: rgba(79, 125, 249, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(79, 125, 249, 0.3); margin-bottom: 20px;">
+          <strong>💳 Stripe Integratie:</strong><br>
+          Bekijk alle Stripe betalingen, subscriptions en customer informatie.<br>
+          Alle betalingen worden automatisch gesynchroniseerd via Stripe webhooks.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+          <div class="stat-card">
+            <div class="stat-label">Stripe Subscriptions</div>
+            <div class="stat-value" id="stripeSubCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Stripe Customers</div>
+            <div class="stat-value" id="stripeCustomerCount">0</div>
+          </div>
+        </div>
+        
+        <div class="row" style="margin-bottom: 20px;">
+          <input id="paymentSearch" placeholder="Zoek op email, Stripe ID..." style="flex: 1;" />
+          <select id="paymentStatus" style="flex: 0 0 150px;">
+            <option value="">Alle statussen</option>
+            <option value="active">Actief</option>
+            <option value="expired">Verlopen</option>
+            <option value="cancelled">Geannuleerd</option>
+          </select>
+        </div>
+        
+        <h4>Stripe Subscriptions</h4>
+        <div id="paymentsList" class="list"></div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="tabSettings" class="tab-content">
+        <h3>⚙️ Systeem Instellingen</h3>
+        
+        <div style="background: rgba(79, 125, 249, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(79, 125, 249, 0.3); margin-bottom: 20px;">
+          <h4>📋 Subscription Plans Beheer</h4>
+          <p class="hint">Pas abonnement plannen aan: prijzen, aantal devices, beschrijvingen.</p>
+          <div id="plansList" class="list" style="margin-top: 15px;"></div>
+        </div>
+        
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 20px;">
+          <h4>💾 Database Beheer</h4>
+          <p class="hint">Export database, backup maken, statistieken bekijken.</p>
+          <div class="row" style="margin-top: 15px;">
+            <button id="exportDbBtn" class="secondary">📥 Export Database (SQL)</button>
+            <button id="dbStatsBtn" class="secondary">📊 Database Statistieken</button>
+          </div>
+          <div id="dbStats" style="margin-top: 15px; display: none;"></div>
+        </div>
+        
+        <div style="background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3); margin-bottom: 20px;">
+          <h4>📧 Email Instellingen</h4>
+          <p class="hint">Configureer email instellingen voor password reset en notificaties.</p>
+          <p class="hint" style="margin-top: 10px;">
+            <strong>Huidige configuratie:</strong> Zie <code>config_email.php</code> voor email instellingen.<br>
+            <strong>Test email:</strong> Gebruik de password reset functie om email te testen.
+          </p>
+        </div>
+        
+        <div style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3);">
+          <h4>🔄 Systeem Onderhoud</h4>
+          <p class="hint">Systeem onderhoudstaken en automatische checks.</p>
+          <div class="row" style="margin-top: 15px;">
+            <button id="checkExpiredSubsBtn" class="secondary">🔄 Check Verlopen Abonnementen</button>
+            <button id="cleanupLogsBtn" class="secondary">🧹 Oude Logs Opruimen</button>
+            <button id="runHealthCheckBtn" class="secondary">🏥 System Health Check</button>
+          </div>
+          <div id="maintenanceMsg" class="msg" style="margin-top: 15px;"></div>
+        </div>
+      </div>
+
+      <!-- System Health Tab -->
+      <div id="tabHealth" class="tab-content">
+        <h3>🏥 System Health Monitoring</h3>
+        <p class="hint" style="background: rgba(79, 125, 249, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(79, 125, 249, 0.3); margin-bottom: 20px;">
+          <strong>📊 Real-time Monitoring:</strong><br>
+          Controleer de gezondheid van het systeem, database connectie, API endpoints en meer.<br>
+          Alle checks worden automatisch uitgevoerd om problemen vroegtijdig te detecteren.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 30px;">
+          <div class="stat-card" id="healthDb">
+            <div class="stat-label">Database</div>
+            <div class="stat-value" style="font-size: 24px;">⏳ Checking...</div>
+          </div>
+          <div class="stat-card" id="healthApi">
+            <div class="stat-label">API Endpoints</div>
+            <div class="stat-value" style="font-size: 24px;">⏳ Checking...</div>
+          </div>
+          <div class="stat-card" id="healthDisk">
+            <div class="stat-label">Disk Space</div>
+            <div class="stat-value" style="font-size: 24px;">⏳ Checking...</div>
+          </div>
+          <div class="stat-card" id="healthBackup">
+            <div class="stat-label">Laatste Backup</div>
+            <div class="stat-value" style="font-size: 20px;">⏳ Checking...</div>
+          </div>
+        </div>
+        
+        <div style="background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <h4>📋 Detailed Health Report</h4>
+          <div id="healthReport" style="margin-top: 15px;">
+            <p class="hint">Klik op "System Health Check" om een volledige health check uit te voeren.</p>
+          </div>
+        </div>
+        
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 20px;">
+          <h4>📧 Email Notificaties</h4>
+          <p class="hint">Configureer email notificaties voor belangrijke events.</p>
+          <div class="row" style="margin-top: 15px;">
+            <label style="flex: 1;"><input type="checkbox" id="notifyNewUser" checked /> Nieuwe gebruiker</label>
+            <label style="flex: 1;"><input type="checkbox" id="notifyNewDevice" checked /> Nieuw device</label>
+            <label style="flex: 1;"><input type="checkbox" id="notifyExpiredSub" checked /> Verlopen abonnement</label>
+            <label style="flex: 1;"><input type="checkbox" id="notifyErrors" checked /> Systeem errors</label>
+          </div>
+          <div class="row" style="margin-top: 15px;">
+            <input id="adminEmail" type="email" placeholder="Admin email voor notificaties" style="flex: 1;" />
+            <button id="saveNotificationsBtn" class="secondary">💾 Opslaan</button>
+          </div>
+          <div id="notificationMsg" class="msg" style="margin-top: 15px;"></div>
+        </div>
+        
+        <div style="background: rgba(245, 158, 11, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3);">
+          <h4>🔄 Automatische Backups</h4>
+          <p class="hint">Configureer automatische dagelijkse backups van de database.</p>
+          <div class="row" style="margin-top: 15px;">
+            <label style="flex: 1;"><input type="checkbox" id="autoBackupEnabled" /> Automatische backups inschakelen</label>
+            <select id="backupTime" style="flex: 0 0 150px;">
+              <option value="00:00">00:00 (Middernacht)</option>
+              <option value="02:00">02:00</option>
+              <option value="04:00">04:00</option>
+              <option value="06:00">06:00</option>
+            </select>
+            <button id="saveBackupSettingsBtn" class="secondary">💾 Opslaan</button>
+          </div>
+          <div id="backupMsg" class="msg" style="margin-top: 15px;"></div>
+          <p class="hint" style="margin-top: 10px;">
+            <strong>Backup locatie:</strong> Backups worden opgeslagen in <code>/backups/</code> directory.<br>
+            <strong>Retentie:</strong> Laatste 30 dagen worden bewaard, oudere backups worden automatisch verwijderd.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="../js/toast.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
+

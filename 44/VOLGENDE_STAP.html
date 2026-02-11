@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>✅ Status - Volgende Stap</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .status-box {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 25px;
+      margin: 20px 0;
+    }
+    .status-box.completed {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .status-box.pending {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+    .checklist li.completed {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid #10b981;
+    }
+    .checklist li.pending {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid #f59e0b;
+    }
+    .checklist li.completed::before {
+      content: "✅ ";
+      font-weight: bold;
+    }
+    .checklist li.pending::before {
+      content: "⏳ ";
+      font-weight: bold;
+    }
+    .btn-large {
+      display: inline-block;
+      padding: 18px 36px;
+      background: linear-gradient(135deg, #4f7df9 0%, #8b5cf6 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.2em;
+      margin: 10px 5px;
+      transition: transform 0.2s ease;
+    }
+    .btn-large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(79, 125, 249, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>✅ Huidige Status</h1>
+      <p class="sub">Je bent goed op weg!</p>
+    </header>
+
+    <section class="status-box completed">
+      <h2>✅ Stap 1: Database Setup - VOLTOOID</h2>
+      <p>Database `pornfree` is aangemaakt met alle tabellen.</p>
+    </section>
+
+    <section class="status-box completed">
+      <h2>✅ Stap 2: DNS Server - ACTIEF</h2>
+      <p>DNS server draait op poort 53. Whitelist-only filtering is actief.</p>
+    </section>
+
+    <section class="status-box pending">
+      <h2>⏳ Stap 3: Abonnement Aansluiten</h2>
+      <p>Sluit een abonnement aan om het systeem te gebruiken.</p>
+      <a href="subscribe.html" class="btn-large">💰 Abonnement Aansluiten</a>
+    </section>
+
+    <section class="status-box pending">
+      <h2>⏳ Stap 4: WireGuard Config Downloaden</h2>
+      <p>Download en importeer je WireGuard config om VPN te activeren.</p>
+      <a href="public/index.html" class="btn-large">🔐 Inloggen & Config Downloaden</a>
+    </section>
+
+    <section class="card">
+      <h2>📋 Checklist</h2>
+      <ul class="checklist">
+        <li class="completed">Database setup gedaan</li>
+        <li class="completed">DNS server gestart</li>
+        <li class="pending">Abonnement aangesloten</li>
+        <li class="pending">WireGuard config gedownload</li>
+        <li class="pending">VPN verbinding actief</li>
+        <li class="pending">Test: Pornografische content geblokkeerd</li>
+        <li class="pending">Test: Whitelist werkt</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>🧪 Verificatie</h2>
+      <div class="status-box">
+        <h3>Test 1: Database Werkt?</h3>
+        <p>Open: <a href="public/index.html">http://localhost/44/public/index.html</a></p>
+        <p>✅ Kun je inloggen → ✅ Database werkt!</p>
+      </div>
+      <div class="status-box">
+        <h3>Test 2: DNS Server Werkt?</h3>
+        <p>Check in terminal:</p>
+        <code>ps aux | grep dns_whitelist_server | grep -v grep</code>
+        <p>✅ Proces draait → ✅ DNS server werkt!</p>
+      </div>
+    </section>
+
+    <footer style="text-align: center; margin: 40px 0; color: var(--muted);">
+      <p>🎯 <strong>Je bent bijna klaar! Volg de volgende stappen om het systeem te gebruiken.</strong></p>
+    </footer>
+  </div>
+</body>
+</html>

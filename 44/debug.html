@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Debug - Site Status</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    .test { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #4CAF50; }
+    .error { border-left-color: #f44336; }
+    .warning { border-left-color: #ff9800; }
+    h1 { color: #333; }
+    pre { background: #f0f0f0; padding: 10px; border-radius: 4px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Site Debug Status</h1>
+  
+  <div class="test">
+    <h3>✅ HTML Laadt</h3>
+    <p>Als je dit ziet, laadt HTML correct.</p>
+  </div>
+  
+  <div class="test" id="cssTest">
+    <h3>⏳ CSS Test...</h3>
+    <p>Wacht op CSS...</p>
+  </div>
+  
+  <div class="test" id="jsTest">
+    <h3>⏳ JavaScript Test...</h3>
+    <p>Wacht op JavaScript...</p>
+  </div>
+  
+  <div class="test" id="apiTest">
+    <h3>⏳ API Test...</h3>
+    <p>Wacht op API...</p>
+  </div>
+  
+  <div class="test">
+    <h3>📋 Console Logs</h3>
+    <pre id="consoleLogs">Geen logs nog...</pre>
+  </div>
+  
+  <script>
+    const logs = [];
+    const originalLog = console.log;
+    const originalError = console.error;
+    
+    console.log = function(...args) {
+      logs.push(['LOG', ...args].join(' '));
+      originalLog.apply(console, args);
+      updateLogs();
+    };
+    
+    console.error = function(...args) {
+      logs.push(['ERROR', ...args].join(' '));
+      originalError.apply(console, args);
+      updateLogs();
+    };
+    
+    function updateLogs() {
+      document.getElementById('consoleLogs').textContent = logs.join('\n');
+    }
+    
+    // Test CSS
+    setTimeout(() => {
+      const cssTest = document.getElementById('cssTest');
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'style.css';
+      link.onload = () => {
+        cssTest.innerHTML = '<h3>✅ CSS Laadt</h3><p>style.css geladen succesvol.</p>';
+        cssTest.classList.remove('warning');
+      };
+      link.onerror = () => {
+        cssTest.innerHTML = '<h3>❌ CSS Fout</h3><p>style.css kon niet worden geladen.</p>';
+        cssTest.classList.add('error');
+      };
+      document.head.appendChild(link);
+    }, 100);
+    
+    // Test JavaScript
+    setTimeout(() => {
+      const jsTest = document.getElementById('jsTest');
+      const script = document.createElement('script');
+      script.src = 'app.js';
+      script.onload = () => {
+        jsTest.innerHTML = '<h3>✅ JavaScript Laadt</h3><p>app.js geladen succesvol.</p>';
+        jsTest.classList.remove('warning');
+      };
+      script.onerror = () => {
+        jsTest.innerHTML = '<h3>❌ JavaScript Fout</h3><p>app.js kon niet worden geladen.</p>';
+        jsTest.classList.add('error');
+      };
+      document.body.appendChild(script);
+    }, 200);
+    
+    // Test API
+    setTimeout(() => {
+      const apiTest = document.getElementById('apiTest');
+      fetch('api/health.php')
+        .then(r => r.json())
+        .then(d => {
+          apiTest.innerHTML = '<h3>✅ API Werkt</h3><pre>' + JSON.stringify(d, null, 2) + '</pre>';
+          apiTest.classList.remove('warning');
+        })
+        .catch(e => {
+          apiTest.innerHTML = '<h3>❌ API Fout</h3><p>' + e.message + '</p>';
+          apiTest.classList.add('error');
+        });
+    }, 500);
+    
+    console.log('✅ Debug script geladen');
+    console.log('📍 URL:', window.location.href);
+    console.log('📍 Hostname:', window.location.hostname);
+  </script>
+</body>
+</html>

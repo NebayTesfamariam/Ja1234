@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remove Blocklist Tables</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .warning strong {
+      color: #856404;
+      font-size: 18px;
+    }
+    .btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    .btn:hover {
+      background: #c82333;
+    }
+    .btn-secondary {
+      background: #6c757d;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .result.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .result.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .result.warning {
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+    }
+    .table-list {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    .table-list ul {
+      margin: 10px 0;
+      padding-left: 25px;
+    }
+    .table-list li {
+      margin: 5px 0;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🗑️ Remove Blocklist Tables</h1>
+    
+    <div class="warning">
+      <strong>⚠️ WAARSCHUWING</strong>
+      <p>Deze actie zal <strong>permanent</strong> alle blocklist tabellen verwijderen:</p>
+      <ul>
+        <li><code>blocklist_global</code></li>
+        <li><code>blocklist_device</code></li>
+        <li><code>blocklist_permanent</code></li>
+        <li><code>blocklist_subscription</code></li>
+      </ul>
+      <p><strong>Zorg dat je een backup hebt gemaakt voordat je doorgaat!</strong></p>
+    </div>
+    
+    <div class="table-list">
+      <h3>📋 Preview</h3>
+      <p>Klik op "Preview" om te zien welke tabellen verwijderd zullen worden:</p>
+      <button class="btn btn-secondary" onclick="preview()">👁️ Preview</button>
+    </div>
+    
+    <div class="warning">
+      <strong>⚠️ Bevestiging Vereist</strong>
+      <p>Om de tabellen daadwerkelijk te verwijderen, klik op de knop hieronder en bevestig:</p>
+      <button class="btn" onclick="confirmRemove()">🗑️ Verwijder Blocklist Tabellen</button>
+    </div>
+    
+    <div id="results"></div>
+  </div>
+
+  <script>
+    async function preview() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="result warning">⏳ Preview wordt geladen...</div>';
+      
+      try {
+        const response = await fetch('remove_blocklist_tables.php');
+        const data = await response.json();
+        
+        if (data.status === 'preview') {
+          const found = Object.keys(data.tables_found || {});
+          let html = '<div class="result ' + (found.length > 0 ? 'warning' : 'success') + '">';
+          html += '<h3>📋 Preview Resultaten</h3>';
+          
+          if (found.length > 0) {
+            html += '<p><strong>Gevonden tabellen:</strong></p><ul>';
+            found.forEach(table => {
+              const info = data.tables_found[table];
+              html += `<li><code>${table}</code> - ${info.row_count || 0} rows</li>`;
+            });
+            html += '</ul>';
+            html += '<p>Deze tabellen zullen worden verwijderd als je bevestigt.</p>';
+          } else {
+            html += '<p>✅ Geen blocklist tabellen gevonden - alles is al opgeschoond!</p>';
+          }
+          
+          html += '</div>';
+          results.innerHTML = html;
+        } else {
+          results.innerHTML = '<div class="result success">✅ ' + data.message + '</div>';
+        }
+      } catch (e) {
+        results.innerHTML = '<div class="result error">❌ Fout: ' + e.message + '</div>';
+      }
+    }
+    
+    async function confirmRemove() {
+      if (!confirm('⚠️ WEET JE HET ZEKER?\n\nDit zal PERMANENT alle blocklist tabellen verwijderen!\n\nZorg dat je een backup hebt gemaakt!\n\nDoorgaan?')) {
+        return;
+      }
+      
+      if (!confirm('⚠️ LAATSTE WAARSCHUWING!\n\nDit kan NIET ongedaan gemaakt worden!\n\nWeet je het 100% zeker?')) {
+        return;
+      }
+      
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="result warning">⏳ Tabellen worden verwijderd...</div>';
+      
+      try {
+        const response = await fetch('remove_blocklist_tables.php?confirm=yes');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+          let html = '<div class="result success">';
+          html += '<h3>✅ Succesvol Verwijderd</h3>';
+          html += '<p><strong>' + data.message + '</strong></p>';
+          
+          if (data.removed && data.removed.length > 0) {
+            html += '<p><strong>Verwijderde tabellen:</strong></p><ul>';
+            data.removed.forEach(item => {
+              html += `<li><code>${item.table}</code> - ${item.message}</li>`;
+            });
+            html += '</ul>';
+          }
+          
+          if (data.summary) {
+            html += '<p><strong>Samenvatting:</strong></p>';
+            html += '<ul>';
+            html += `<li>Verwijderd: ${data.summary.removed}</li>`;
+            html += `<li>Niet gevonden: ${data.summary.not_found}</li>`;
+            html += `<li>Fouten: ${data.summary.errors}</li>`;
+            html += '</ul>';
+          }
+          
+          html += '</div>';
+          results.innerHTML = html;
+        } else {
+          let html = '<div class="result ' + (data.errors && data.errors.length > 0 ? 'error' : 'warning') + '">';
+          html += '<h3>⚠️ ' + data.status + '</h3>';
+          html += '<p>' + data.message + '</p>';
+          
+          if (data.errors && data.errors.length > 0) {
+            html += '<p><strong>Fouten:</strong></p><ul>';
+            data.errors.forEach(error => {
+              html += `<li><code>${error.table}</code> - ${error.message}</li>`;
+            });
+            html += '</ul>';
+          }
+          
+          if (data.remaining && data.remaining.length > 0) {
+            html += '<p><strong>Nog aanwezig:</strong></p><ul>';
+            data.remaining.forEach(table => {
+              html += `<li><code>${table}</code></li>`;
+            });
+            html += '</ul>';
+          }
+          
+          html += '</div>';
+          results.innerHTML = html;
+        }
+      } catch (e) {
+        results.innerHTML = '<div class="result error">❌ Fout: ' + e.message + '</div>';
+      }
+    }
+  </script>
+</body>
+</html>

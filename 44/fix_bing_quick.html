@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bing Block Fix - Quick Diagnostic</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    .btn:hover {
+      background: #c82333;
+    }
+    .btn-success {
+      background: #28a745;
+    }
+    .btn-success:hover {
+      background: #218838;
+    }
+    .issue {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .issue.critical {
+      background: #fee;
+      border-left: 4px solid #f00;
+    }
+    .issue.warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+    }
+    .issue.info {
+      background: #e7f3ff;
+      border-left: 4px solid #007bff;
+    }
+    .domain-item {
+      display: inline-block;
+      background: #fee;
+      color: #c00;
+      padding: 5px 10px;
+      border-radius: 4px;
+      margin: 5px;
+      font-family: monospace;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔒 Bing Block Fix</h1>
+    <p>Check waarom Bing nog werkt en fix het direct</p>
+    
+    <div class="input-group">
+      <label><strong>Device ID:</strong></label>
+      <input type="number" id="deviceId" placeholder="Bijv. 1, 2, 3..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+    </div>
+    
+    <button class="btn" onclick="checkBing()">🔍 Check Bing Status</button>
+    <button class="btn btn-success" onclick="removeBing()">🗑️ Verwijder Bing uit Whitelist</button>
+    
+    <div id="results"></div>
+  </div>
+
+  <script>
+    async function checkBing() {
+      const deviceId = document.getElementById('deviceId').value;
+      const results = document.getElementById('results');
+      
+      if (!deviceId) {
+        alert('Voer Device ID in');
+        return;
+      }
+      
+      results.innerHTML = '<p>⏳ Checking...</p>';
+      
+      try {
+        const response = await fetch(`check_bing_block.php?device_id=${deviceId}`);
+        const data = await response.json();
+        
+        displayResults(data);
+      } catch (e) {
+        results.innerHTML = '<div class="issue critical">❌ Error: ' + e.message + '</div>';
+      }
+    }
+    
+    async function removeBing() {
+      const deviceId = document.getElementById('deviceId').value;
+      const results = document.getElementById('results');
+      
+      if (!deviceId) {
+        alert('Voer Device ID in');
+        return;
+      }
+      
+      if (!confirm('Weet je zeker dat je Bing/Microsoft domeinen wilt verwijderen uit whitelist?')) {
+        return;
+      }
+      
+      results.innerHTML = '<p>⏳ Verwijderen...</p>';
+      
+      try {
+        const response = await fetch(`remove_bing_from_whitelist.php?device_id=${deviceId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          results.innerHTML = '<div class="issue info">✅ ' + data.message + '</div>';
+          if (data.removed && data.removed.length > 0) {
+            results.innerHTML += '<p><strong>Verwijderd:</strong></p><ul>';
+            data.removed.forEach(item => {
+              results.innerHTML += '<li>' + item + '</li>';
+            });
+            results.innerHTML += '</ul>';
+          }
+          setTimeout(() => checkBing(), 1000);
+        } else {
+          results.innerHTML = '<div class="issue warning">ℹ️ ' + data.message + '</div>';
+        }
+      } catch (e) {
+        results.innerHTML = '<div class="issue critical">❌ Error: ' + e.message + '</div>';
+      }
+    }
+    
+    function displayResults(data) {
+      const results = document.getElementById('results');
+      let html = '';
+      
+      // Bing in Whitelist
+      html += '<h2>🔍 Bing Status</h2>';
+      
+      if (data.bing_in_whitelist) {
+        html += '<div class="issue critical">';
+        html += '<strong>❌ PROBLEEM: Bing/Microsoft staat in whitelist!</strong>';
+        html += '<p>Dit is waarom Bing nog werkt. Verwijder Bing uit whitelist.</p>';
+        
+        if (data.bing_domains_found && data.bing_domains_found.length > 0) {
+          html += '<p><strong>Gevonden Bing/Microsoft domeinen:</strong></p>';
+          html += '<div>';
+          data.bing_domains_found.forEach(domain => {
+            html += '<span class="domain-item">' + domain + '</span>';
+          });
+          html += '</div>';
+        }
+        html += '</div>';
+      } else {
+        html += '<div class="issue info">';
+        html += '<strong>✅ Bing.com staat NIET in whitelist</strong>';
+        html += '<p>Dit is goed. Als Bing nog werkt, check andere oorzaken hieronder.</p>';
+        html += '</div>';
+      }
+      
+      // Device Status
+      if (data.device_status) {
+        html += '<h2>📱 Device Status</h2>';
+        html += '<p><strong>Status:</strong> ' + data.device_status + '</p>';
+        if (data.device_status !== 'active') {
+          html += '<div class="issue warning">⚠️ Device is niet actief - activeer device eerst</div>';
+        }
+      }
+      
+      // Whitelist
+      if (data.whitelist && data.whitelist.length > 0) {
+        html += '<h2>✅ Whitelist</h2>';
+        html += '<p><strong>Aantal domeinen:</strong> ' + data.whitelist.length + '</p>';
+        html += '<p><strong>Domeinen:</strong></p>';
+        html += '<div style="max-height: 200px; overflow-y: auto; background: #f0f0f0; padding: 10px; border-radius: 4px;">';
+        data.whitelist.forEach(domain => {
+          const isBing = /bing|microsoft/i.test(domain);
+          html += '<span style="display: inline-block; background: ' + (isBing ? '#fee' : '#e7f3ff') + '; padding: 5px 10px; border-radius: 4px; margin: 5px; font-family: monospace;' + (isBing ? ' font-weight: bold; color: #c00;' : '') + '">' + domain + '</span>';
+        });
+        html += '</div>';
+      }
+      
+      // Recommendations
+      if (data.recommendations && data.recommendations.length > 0) {
+        html += '<h2>💡 Aanbevelingen</h2>';
+        html += '<ul>';
+        data.recommendations.forEach(rec => {
+          html += '<li>' + rec + '</li>';
+        });
+        html += '</ul>';
+      }
+      
+      // Next Steps
+      html += '<h2>🔧 Volgende Stappen</h2>';
+      html += '<ol>';
+      if (data.bing_in_whitelist) {
+        html += '<li><strong>Klik op "Verwijder Bing uit Whitelist" hierboven</strong></li>';
+      }
+      html += '<li>Check VPN verbinding (moet VPN IP zijn, niet je eigen IP)</li>';
+      html += '<li>Check DNS server (moet draaien op 10.10.0.1:53)</li>';
+      html += '<li>Check Chrome DoH (moet UIT zijn in chrome://settings/security)</li>';
+      html += '<li>Check Firewall regels (QUIC, DoT, DNS forcing)</li>';
+      html += '<li>Test: <code>nslookup bing.com 10.10.0.1</code> (moet NXDOMAIN zijn)</li>';
+      html += '</ol>';
+      
+      results.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

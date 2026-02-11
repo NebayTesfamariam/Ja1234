@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.nebay.pornfree.dns</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/python3</string>
+        <string>/Applications/XAMPP/xamppfiles/htdocs/44/dns_whitelist_server.py</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/44/logs/dns_server.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/44/logs/dns_server.error.log</string>
+    <key>WorkingDirectory</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/44</string>
+    <key>UserName</key>
+    <string>root</string>
+</dict>
+</plist>

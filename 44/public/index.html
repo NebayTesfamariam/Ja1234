@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Porno-vrij Control Panel</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🛡️ Porno-vrij Control Panel</h1>
+      <p class="sub">Pornografische content wordt NOOIT getoond - 100% permanente blokkering op netwerkniveau<br>
+        Werkt op alle browsers (Chrome, Firefox, Safari, Edge) en blokkeert ook pornografische content via normale sites
+      </p>
+    </header>
+
+    <section class="card" id="loginCard">
+      <h2>🔐 Inloggen</h2>
+      <p class="hint"
+        style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 15px; font-size: 0.9em;">
+        <strong>🤖 Automatische Device Registratie:</strong><br>
+        Log in vanaf je nieuwe device (iPhone, laptop, tablet, etc.) en het wordt automatisch geregistreerd!<br>
+        Device naam wordt automatisch gedetecteerd, WireGuard key en IP worden automatisch gegenereerd - geen extra
+        stappen nodig!<br>
+        <span style="font-size: 0.85em; opacity: 0.9;">💡 <strong>Tip:</strong> Het systeem herkent automatisch of je al
+          bent ingelogd vanaf dit device - hetzelfde device wordt niet opnieuw toegevoegd aan je account.</span>
+      </p>
+      <p class="hint"
+        style="background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); margin-bottom: 15px; font-size: 0.9em; color: #dc2626;">
+        <strong>⚠️ Belangrijk:</strong> Als pornografische content niet wordt geblokkeerd:<br>
+        1. Log in op deze pagina (device wordt automatisch toegevoegd)<br>
+        2. Check of je device actief is in dashboard<br>
+        3. Check of je abonnement actief is<br>
+        4. Open browser console (F12) om filter status te zien
+      </p>
+      <div class="row">
+        <input id="email" type="email" placeholder="E-mailadres" value="admin@test.com" />
+        <input id="password" type="password" placeholder="Wachtwoord" value="123456" />
+        <button id="loginBtn">Inloggen</button>
+      </div>
+      <p class="hint">Demo account: admin@test.com / 123456</p>
+      <p class="hint" style="text-align: center; margin-top: 10px;">
+        <a href="../reset_password_request.html"
+          style="color: var(--primary); text-decoration: none; font-size: 0.9em;">
+          🔑 Wachtwoord vergeten?
+        </a>
+      </p>
+      <p class="hint" style="text-align: center; margin-top: 10px;">
+        <a href="../register_super_admin.html"
+          style="color: var(--primary); text-decoration: none; font-size: 0.9em; font-weight: bold;">
+          👤 Registreer als Super Admin
+        </a>
+      </p>
+      <p class="hint" style="text-align: center; margin-top: 10px;">
+        <a href="../superadmin_login.html"
+          style="color: var(--danger); text-decoration: none; font-size: 0.9em; font-weight: bold;">
+          🔴 Super Admin Direct Login
+        </a>
+      </p>
+      <div id="loginMsg" class="msg"></div>
+    </section>
+
+    <section class="card hidden" id="appCard">
+      <div class="topbar">
+        <div>
+          <h2>📱 Device Beheer</h2>
+          <div class="small" id="meLine"></div>
+        </div>
+        <button id="logoutBtn" class="secondary">Uitloggen</button>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <h3>➕ Nieuw Device Toevoegen</h3>
+          <p class="hint"
+            style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(79, 125, 249, 0.15) 100%); padding: 15px; border-radius: 12px; border: 2px solid rgba(16, 185, 129, 0.3); margin-bottom: 20px; font-size: 0.95em;">
+            <strong style="font-size: 1.1em;">🚀 Super Eenvoudig - 1 Klik!</strong><br>
+            Klik op de knop hieronder en je device wordt automatisch toegevoegd.<br>
+            ✅ Device naam wordt automatisch gedetecteerd (iPhone, Android, PC, etc.)<br>
+            ✅ WireGuard key wordt automatisch gegenereerd<br>
+            ✅ IP adres wordt automatisch toegewezen<br>
+            ✅ Direct actief en beschermd!<br><br>
+            <span style="font-size: 0.9em; opacity: 0.95;">💡 <strong>Tip:</strong> Het systeem voorkomt automatisch dat
+              hetzelfde device meerdere keren wordt toegevoegd.</span>
+          </p>
+
+          <div class="row" style="margin-bottom: 20px;">
+            <button id="autoAddDeviceBtn" class="btn-primary"
+              style="width: 100%; padding: 20px; font-size: 1.2em; font-weight: bold; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+              ➕ Device Toevoegen (1 Klik!)
+            </button>
+          </div>
+
+          <div
+            style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.3); margin: 20px 0;">
+            <h4 style="margin-bottom: 10px; color: var(--primary);">🔗 Of gebruik een registratie link</h4>
+            <p style="margin-bottom: 10px; font-size: 0.9em;">
+              Genereer een speciale link om een device toe te voegen zonder in te loggen. Perfect voor het delen met
+              anderen of voor gebruik op andere devices.
+            </p>
+            <button id="generateMyLinkBtn" class="secondary" style="width: 100%; padding: 12px; margin-bottom: 10px;">
+              🔗 Mijn Registratie Link Genereren
+            </button>
+            <div id="myLinkResult" style="margin-top: 10px;"></div>
+          </div>
+
+          <div
+            style="background: rgba(79, 125, 249, 0.1); padding: 15px; border-radius: 12px; border: 1px solid rgba(79, 125, 249, 0.3); margin: 20px 0;">
+            <h4 style="margin-bottom: 10px; color: var(--primary);">💡 Hoe werkt het?</h4>
+            <div style="display: grid; gap: 10px;">
+              <div style="display: flex; align-items: start; gap: 10px;">
+                <span style="font-size: 24px;">1️⃣</span>
+                <div>
+                  <strong>Klik op "Device Toevoegen"</strong><br>
+                  <span style="font-size: 0.9em; color: var(--muted);">Het systeem detecteert automatisch je device
+                    type</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: start; gap: 10px;">
+                <span style="font-size: 24px;">2️⃣</span>
+                <div>
+                  <strong>Automatische Registratie</strong><br>
+                  <span style="font-size: 0.9em; color: var(--muted);">WireGuard key en IP worden automatisch
+                    gegenereerd</span>
+                </div>
+              </div>
+              <div style="display: flex; align-items: start; gap: 10px;">
+                <span style="font-size: 24px;">3️⃣</span>
+                <div>
+                  <strong>Direct Beschermd!</strong><br>
+                  <span style="font-size: 0.9em; color: var(--muted);">Pornografische content wordt direct
+                    geblokkeerd</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <details
+            style="margin-top: 20px; background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--line);">
+            <summary style="cursor: pointer; color: var(--text); font-weight: 600; font-size: 0.95em;">
+              🔧 Geavanceerd: Handmatig Toevoegen (optioneel)
+            </summary>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--line);">
+              <p class="hint" style="margin-bottom: 15px; font-size: 0.9em;">
+                Alleen gebruiken als je specifieke WireGuard instellingen hebt.
+              </p>
+              <div class="row" style="margin-bottom: 10px;">
+                <input id="devName" placeholder="Device naam (bijv. iPhone)" />
+              </div>
+              <div class="row" style="margin-bottom: 10px;">
+                <input id="devKey" placeholder="WireGuard public key (optioneel)" />
+              </div>
+              <div class="row">
+                <input id="devIp" placeholder="WireGuard IP (optioneel - bijv. 10.10.0.12)" />
+                <button id="addDeviceBtn" class="secondary">Handmatig Toevoegen</button>
+              </div>
+            </div>
+          </details>
+
+          <div id="deviceMsg" class="msg" style="margin-top: 15px;"></div>
+
+          <h3 id="subscriptionInfoHeader" style="display: none;">💳 Abonnement Info</h3>
+          <div id="subscriptionInfo" class="list"></div>
+
+          <h3>📱 Jouw Devices</h3>
+          <p class="hint"
+            style="font-size: 0.9em; margin-bottom: 15px; background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            <strong>🔒 Belangrijke Regels:</strong><br>
+            ✅ <strong>Devices blijven actief</strong> zodra ze zijn toegevoegd - je kunt ze niet blokkeren<br>
+            🔒 <strong>Alleen administrators</strong> kunnen devices blokkeren, deblokkeren of verwijderen<br>
+            💡 <strong>Tip:</strong> Als je abonnement verloopt, worden devices automatisch geblokkeerd door het
+            systeem. Betaal opnieuw om service te hervatten.
+          </p>
+          <div class="search-box">
+            <input type="text" id="deviceSearch" placeholder="Zoek devices..." onkeyup="filterDevices()" />
+          </div>
+          <div id="devicesList" class="list"></div>
+        </div>
+
+        <div>
+          <h3>✅ Whitelist Beheer (Optioneel - Niet Vereist)</h3>
+          <p class="hint"
+            style="color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            <strong>🛡️ Pornografische content wordt NOOIT getoond</strong><br>
+            Pornografische video's en foto's worden permanent geblokkeerd - kan niet worden uitgeschakeld.<br><br>
+            <strong>✅ Normale websites werken automatisch - geen whitelist nodig!</strong><br>
+            Je kunt gewoon surfen naar google.com, wikipedia.org, etc. zonder ze toe te voegen.<br>
+            Whitelist is alleen optioneel voor expliciete overrides als dat nodig is.
+          </p>
+
+          <div class="row">
+            <select id="deviceSelect"></select>
+          </div>
+
+          <div class="row">
+            <input id="wlDomain" placeholder="Domein toevoegen (bijv. wikipedia.org)" />
+            <button id="addWlBtn">Toevoegen</button>
+          </div>
+
+          <div class="row">
+            <input id="wlComment" placeholder="Opmerking (optioneel)" />
+          </div>
+
+          <div id="wlMsg" class="msg"></div>
+
+          <h3>📋 Whitelist (Optioneel)</h3>
+          <p class="hint" style="font-size: 0.85em; margin-bottom: 10px; color: var(--muted);">
+            ℹ️ Whitelist is optioneel. Normale websites werken zonder whitelist.
+            Gebruik dit alleen als je expliciet een domain wilt toestaan dat mogelijk geblokkeerd is.
+          </p>
+          <div class="search-box">
+            <input type="text" id="whitelistSearch" placeholder="Zoek in whitelist..." onkeyup="filterWhitelist()" />
+          </div>
+          <div id="wlList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="small">
+        <strong>🛡️ Porno-vrij Platform</strong> | Automatische 100% blokkering op netwerkniveau<br>
+        Blokkeert pornografische content op <strong>alle browsers</strong> en <strong>alle devices</strong><br>
+        <strong>🌍 Meertalige detectie:</strong> Werkt in <strong>ALLE GOOGLE TRANSLATE TALEN</strong> - 249 talen
+        ondersteund! Volledige wereldwijde dekking!<br>
+        Whitelist systeem voor domein toegang
+      </div>
+    </footer>
+  </div>
+
+  <script src="../js/toast.js"></script>
+  <script src="../app.js"></script>
+</body>
+
+</html>

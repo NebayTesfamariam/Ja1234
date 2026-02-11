@@ -1,0 +1,48 @@
+🚀 QUICK START: MySQL, Apache, DNS Server
+==========================================
+
+METHODE 1: DOUBLE-CLICK (MEEST EENVOUDIG)
+------------------------------------------
+1. Open Finder
+2. Ga naar: /Applications/XAMPP/xamppfiles/htdocs/44
+3. Double-click op: START_ALL_SERVICES.command
+
+Terminal opent automatisch en vraagt om je wachtwoord!
+
+
+METHODE 2: TERMINAL COMMANDO
+-----------------------------
+Open Terminal en voer uit:
+
+cd /Applications/XAMPP/xamppfiles/htdocs/44
+./START_ALL_SERVICES.sh
+
+Je wordt gevraagd om je wachtwoord:
+- Type je wachtwoord (je ziet niets typen - dat is normaal!)
+- Druk ENTER
+
+
+METHODE 3: APPLE SCRIPT (AUTOMATISCH)
+--------------------------------------
+Open Terminal en voer uit:
+
+cd /Applications/XAMPP/xamppfiles/htdocs/44
+osascript START_ALL_SERVICES.applescript
+
+Of double-click op START_ALL_SERVICES.applescript in Finder
+
+
+VERIFICATIE
+-----------
+Check of alles draait:
+
+pgrep -x mysqld && echo "✅ MySQL" || echo "❌ MySQL"
+pgrep -x httpd && echo "✅ Apache" || echo "❌ Apache"
+pgrep -f dns_whitelist_server && echo "✅ DNS" || echo "❌ DNS"
+
+
+TEST
+----
+Website: http://localhost/44/
+API: http://localhost/44/api/health.php
+DNS: dig @127.0.0.1 google.com

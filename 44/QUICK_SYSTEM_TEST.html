@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick System Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 { color: #333; margin-bottom: 20px; }
+    .test-item {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid;
+    }
+    .test-pending {
+      background: #f0f0f0;
+      border-color: #999;
+    }
+    .test-pass {
+      background: #d4edda;
+      border-color: #28a745;
+    }
+    .test-fail {
+      background: #f8d7da;
+      border-color: #dc3545;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    .btn:hover { background: #0056b3; }
+    .status-icon {
+      font-size: 20px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔍 Quick System Test</h1>
+    <p>Test of het systeem correct werkt</p>
+    
+    <button class="btn" onclick="runAllTests()">▶️ Run All Tests</button>
+    <button class="btn" onclick="checkSystemHealth()">🏥 System Health</button>
+    <button class="btn" onclick="checkCompliance()">✅ Compliance Check</button>
+    
+    <div id="results"></div>
+  </div>
+
+  <script>
+    async function runAllTests() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="test-item test-pending">⏳ Running tests...</div>';
+      
+      const tests = [
+        { name: 'System Health Check', url: 'api/system_check.php' },
+        { name: 'Compliance Verification', url: 'verify_system_compliance.php' },
+        { name: 'Database Connection', url: 'api/health.php' }
+      ];
+      
+      let html = '<h2>Test Results</h2>';
+      
+      for (const test of tests) {
+        html += `<div class="test-item test-pending">⏳ Testing: ${test.name}...</div>`;
+        results.innerHTML = html;
+        
+        try {
+          const response = await fetch(test.url);
+          const data = await response.json();
+          
+          const status = data.error || (data.compliance_status === 'non_compliant') ? 'fail' : 'pass';
+          const icon = status === 'pass' ? '✅' : '❌';
+          const className = status === 'pass' ? 'test-pass' : 'test-fail';
+          
+          html = html.replace(
+            `<div class="test-item test-pending">⏳ Testing: ${test.name}...</div>`,
+            `<div class="test-item ${className}"><span class="status-icon">${icon}</span> ${test.name}: ${status === 'pass' ? 'PASS' : 'FAIL'}</div>`
+          );
+          results.innerHTML = html;
+          
+        } catch (e) {
+          html = html.replace(
+            `<div class="test-item test-pending">⏳ Testing: ${test.name}...</div>`,
+            `<div class="test-item test-fail"><span class="status-icon">❌</span> ${test.name}: ERROR - ${e.message}</div>`
+          );
+          results.innerHTML = html;
+        }
+      }
+      
+      html += '<div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 8px;">';
+      html += '<strong>💡 Next Steps:</strong><ul style="margin-top: 10px;">';
+      html += '<li>Check <a href="verify_compliance.html">Compliance Verification</a> for detailed results</li>';
+      html += '<li>Check <a href="monitor_dashboard.html">Monitoring Dashboard</a> for system metrics</li>';
+      html += '<li>Run test scripts: <code>./test_empty_whitelist.sh</code></li>';
+      html += '</ul></div>';
+      
+      results.innerHTML = html;
+    }
+    
+    async function checkSystemHealth() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="test-item test-pending">⏳ Checking system health...</div>';
+      
+      try {
+        const response = await fetch('api/system_check.php');
+        const data = await response.json();
+        
+        let html = '<h2>System Health</h2>';
+        
+        if (data.checks) {
+          data.checks.forEach(check => {
+            const status = check.status === 'ok' ? 'pass' : 'fail';
+            const icon = status === 'pass' ? '✅' : '❌';
+            const className = status === 'pass' ? 'test-pass' : 'test-fail';
+            
+            html += `<div class="test-item ${className}"><span class="status-icon">${icon}</span> ${check.name}: ${check.message}</div>`;
+          });
+        } else {
+          html += `<div class="test-item test-fail">❌ Error: ${data.error || 'Unknown error'}</div>`;
+        }
+        
+        results.innerHTML = html;
+      } catch (e) {
+        results.innerHTML = `<div class="test-item test-fail">❌ Error: ${e.message}</div>`;
+      }
+    }
+    
+    async function checkCompliance() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="test-item test-pending">⏳ Checking compliance...</div>';
+      
+      try {
+        const response = await fetch('verify_system_compliance.php');
+        const data = await response.json();
+        
+        let html = '<h2>Compliance Status</h2>';
+        
+        const statusClass = data.compliance_status === 'compliant' ? 'test-pass' : 'test-fail';
+        const statusIcon = data.compliance_status === 'compliant' ? '✅' : '❌';
+        const statusText = data.compliance_status === 'compliant' ? 'COMPLIANT' : 'NON-COMPLIANT';
+        
+        html += `<div class="test-item ${statusClass}"><span class="status-icon">${statusIcon}</span> <strong>Status: ${statusText}</strong></div>`;
+        html += `<div style="margin: 15px 0; padding: 15px; background: #f0f0f0; border-radius: 8px;">`;
+        html += `<p><strong>Checks Passed:</strong> ${data.checks_passed} / ${data.total_checks}</p>`;
+        html += `<p><strong>Checks Failed:</strong> ${data.checks_failed} / ${data.total_checks}</p>`;
+        html += `</div>`;
+        
+        if (data.checks) {
+          html += '<h3>Detailed Checks:</h3>';
+          data.checks.forEach(check => {
+            const status = check.status === 'pass' ? 'pass' : 'fail';
+            const icon = status === 'pass' ? '✅' : '❌';
+            const className = status === 'pass' ? 'test-pass' : 'test-fail';
+            
+            html += `<div class="test-item ${className}"><span class="status-icon">${icon}</span> ${check.name}: ${check.message}</div>`;
+          });
+        }
+        
+        results.innerHTML = html;
+      } catch (e) {
+        results.innerHTML = `<div class="test-item test-fail">❌ Error: ${e.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

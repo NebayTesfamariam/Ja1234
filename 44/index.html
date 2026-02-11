@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="nl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Porno-vrij Internet - 100% Blokkering</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .landing {
+      text-align: center;
+      padding: 100px 20px;
+      position: relative;
+    }
+
+    .landing::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(79, 125, 249, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .landing h1 {
+      font-size: 4.5em;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInUp 0.8s ease;
+      text-shadow: 0 0 40px rgba(79, 125, 249, 0.3);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .landing p {
+      font-size: 1.5em;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 40px 0;
+    }
+
+    .btn-large {
+      padding: 18px 36px;
+      font-size: 1.2em;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(79, 125, 249, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-large::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-large:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f7df9 0%, #8b5cf6 100%);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5d8aff 0%, #9d7af9 100%);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(79, 125, 249, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--line);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .features-preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin: 60px 0;
+    }
+
+    .feature-preview {
+      text-align: center;
+      padding: 40px 30px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-preview::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .feature-preview:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(79, 125, 249, 0.3);
+    }
+
+    .feature-preview:hover::before {
+      opacity: 1;
+    }
+
+    .feature-preview .icon {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .feature-preview:hover .icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .guarantee-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 2px solid var(--danger);
+      border-radius: 16px;
+      padding: 30px;
+      margin: 40px 0;
+      text-align: center;
+    }
+
+    .guarantee-box h3 {
+      color: var(--danger);
+      font-size: 2em;
+      margin-bottom: 20px;
+      font-weight: 800;
+      text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🛡️ Porno-vrij Internet</h1>
+      <p class="sub">100% Automatische Blokkering - Volledig Automatisch, Direct Actief</p>
+      <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.9;">
+        ✅ Account aanmaken → ✅ Abonnement → ✅ Device automatisch geregistreerd → ✅ Direct beschermd!
+      </p>
+    </header>
+
+    <section class="landing">
+      <h1>Bescherm jezelf en je gezin</h1>
+      <p>
+        Automatische 100% blokkering van pornografische content op alle devices.<br>
+        Werkt op netwerkniveau - niet alleen in de browser, maar overal.
+      </p>
+
+      <div class="cta-buttons">
+        <a href="subscribe.html" class="btn-large btn-primary">🛡️ Abonnement Aansluiten</a>
+        <a href="public/index.html" class="btn-large btn-secondary">🔐 Inloggen</a>
+      </div>
+    </section>
+
+    <section class="guarantee-box">
+      <h3>🛡️ Pornografische Content wordt NOOIT getoond</h3>
+      <p style="font-size: 1.2em; line-height: 1.8;">
+        Direct na aanmelding wordt alle pornografische content automatisch en permanent geblokkeerd.<br>
+        Deze blokkering kan niet worden uitgeschakeld - 100% bescherming, altijd actief.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>✨ Waarom Porno-vrij?</h2>
+      <div class="features-preview">
+        <div class="feature-preview">
+          <div class="icon">🚫</div>
+          <h3>100% Blokkering</h3>
+          <p>Pornografische sites worden permanent geblokkeerd. Ook via normale sites en alle browsers (Chrome, Firefox,
+            Safari, Edge). <strong>Werkt in alle talen</strong> - Nederlands, Engels, Duits, Frans, Spaans, etc. Kan
+            niet worden uitgeschakeld.</p>
+        </div>
+        <div class="feature-preview">
+          <div class="icon">📱</div>
+          <h3>Alle Devices</h3>
+          <p>Werkt op telefoon, tablet, laptop - alle devices die je toevoegt.</p>
+        </div>
+        <div class="feature-preview">
+          <div class="icon">🌐</div>
+          <h3>Overal & Alle Browsers</h3>
+          <p>Werkt op Wi-Fi, 4G en 5G. Blokkeert pornografische content in Chrome, Firefox, Safari, Edge - alle
+            browsers.</p>
+        </div>
+        <div class="feature-preview">
+          <div class="icon">⚡</div>
+          <h3>Direct Actief</h3>
+          <p>Na aanmelding wordt je abonnement direct actief. Pornografische content wordt meteen geblokkeerd.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>💰 Eenvoudige Prijzen</h2>
+      <div style="text-align: center; margin: 30px 0;">
+        <p style="font-size: 1.2em; margin-bottom: 20px;">
+          Kies het plan dat bij je past. Alle plannen bieden 100% blokkering.
+        </p>
+        <a href="subscribe.html" class="btn-large btn-primary">Bekijk Abonnementen →</a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="small">
+        <strong>🛡️ Porno-vrij Platform</strong> | 100% Automatische Blokkering<br>
+        Pornografische content wordt NOOIT getoond - permanente blokkering op netwerkniveau<br>
+        <a href="subscribe.html" style="color: var(--primary);">Abonnement Aansluiten</a> |
+        <a href="public/index.html" style="color: var(--primary);">Inloggen</a> |
+        <a href="admin/index.html" style="color: var(--primary);">Admin</a> |
+        <a href="superadmin_login.html" style="color: var(--danger); font-weight: bold;">🔴 Super Admin Login</a> |
+        <a href="auto_setup.php" style="color: var(--success); font-weight: bold;">🚀 Auto Setup</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+🚨 QUICK FIX: ERR_CONNECTION_REFUSED
+=====================================
+
+PROBLEEM: Apache draait niet → localhost werkt niet
+
+OPLOSSING: Start Apache met één van deze methoden:
+
+---
+
+METHODE 1: DOUBLE-CLICK (MEEST EENVOUDIG)
+------------------------------------------
+1. Open Finder
+2. Ga naar: /Applications/XAMPP/xamppfiles/htdocs/44
+3. Double-click op: START_APACHE_NOW.command
+
+Terminal opent automatisch en vraagt om je wachtwoord!
+
+---
+
+METHODE 2: TERMINAL COMMANDO (SNELSTE)
+--------------------------------------
+Open Terminal en voer uit:
+
+cd /Applications/XAMPP/xamppfiles/htdocs/44
+./START_APACHE_NOW.sh
+
+Je wordt gevraagd om je wachtwoord:
+- Type je wachtwoord (je ziet niets typen - dat is normaal!)
+- Druk ENTER
+
+---
+
+METHODE 3: HANDMATIG STARTEN
+------------------------------
+Open Terminal en voer uit:
+
+sudo /Applications/XAMPP/xamppfiles/bin/httpd -k start
+
+Je wordt gevraagd om je wachtwoord.
+
+---
+
+VERIFICATIE
+-----------
+Na starten, check of Apache draait:
+
+pgrep -x httpd && echo "✅ Apache draait" || echo "❌ Apache draait niet"
+
+Check poort 80:
+
+sudo lsof -i :80
+
+Moet "httpd" tonen!
+
+---
+
+TEST
+----
+Na starten, test:
+
+http://localhost/44/
+
+Moet nu werken!
+
+---
+
+BELANGRIJK
+----------
+✅ Apache MOET blijven draaien
+✅ Poort 80 moet beschikbaar zijn
+✅ Geen andere webserver op poort 80

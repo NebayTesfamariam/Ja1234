@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Super Admin Registratie</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .register-card {
+      max-width: 500px;
+      margin: 50px auto;
+    }
+    .warning-box {
+      background: rgba(255, 193, 7, 0.1);
+      border: 2px solid rgba(255, 193, 7, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+    .info-box {
+      background: rgba(79, 125, 249, 0.1);
+      border: 2px solid rgba(79, 125, 249, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🛡️ Super Admin Registratie</h1>
+      <p class="sub">Registreer jezelf als eerste super admin</p>
+    </header>
+
+    <section class="card register-card" id="registerCard">
+      <div class="warning-box">
+        <strong>⚠️ Belangrijk:</strong> Dit is een eenmalige registratie. Alleen de eerste gebruiker kan zich als super admin registreren. Als er al een admin bestaat, wordt je account als normale gebruiker aangemaakt.
+      </div>
+
+      <div class="info-box">
+        <strong>ℹ️ Super Admin Rechten:</strong>
+        <ul style="margin: 10px 0; padding-left: 20px;">
+          <li>Toegang tot het volledige admin panel</li>
+          <li>Gebruikers en devices beheren</li>
+          <li>Blocklist beheren</li>
+          <li>Alle systeeminstellingen wijzigen</li>
+        </ul>
+      </div>
+
+      <h2>📝 Registreer Super Admin Account</h2>
+      <div class="row">
+        <input id="email" type="email" placeholder="E-mailadres" required />
+        <input id="password" type="password" placeholder="Wachtwoord (min. 6 karakters)" required />
+        <input id="passwordConfirm" type="password" placeholder="Bevestig wachtwoord" required />
+        <button id="registerBtn" class="btn-primary">Registreer als Super Admin</button>
+      </div>
+      <div id="registerMsg" class="msg"></div>
+      
+      <p class="hint" style="text-align: center; margin-top: 20px;">
+        <a href="public/index.html" style="color: var(--primary); text-decoration: none;">
+          ← Terug naar inloggen
+        </a>
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function setMsg(el, text, isError = false) {
+      if (el) {
+        el.textContent = text || "";
+        el.style.color = isError ? "#ff6b6b" : "#51cf66";
+      }
+    }
+
+    async function register() {
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      const passwordConfirm = $("passwordConfirm").value;
+
+      // Validation
+      if (!email || !password || !passwordConfirm) {
+        setMsg($("registerMsg"), "❌ Vul alle velden in", true);
+        return;
+      }
+
+      if (password.length < 6) {
+        setMsg($("registerMsg"), "❌ Wachtwoord moet minimaal 6 karakters lang zijn", true);
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        setMsg($("registerMsg"), "❌ Wachtwoorden komen niet overeen", true);
+        return;
+      }
+
+      if (!email.includes("@")) {
+        setMsg($("registerMsg"), "❌ Ongeldig e-mailadres", true);
+        return;
+      }
+
+      setMsg($("registerMsg"), "⏳ Registreren...");
+      $("registerBtn").disabled = true;
+
+      try {
+        const response = await fetch("api/register_super_admin.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        });
+
+        // Check if response is ok before parsing JSON
+        if (!response.ok) {
+          let errorMessage = "Registratie mislukt (HTTP " + response.status + ")";
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            errorMessage = response.statusText || errorMessage;
+          }
+          throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+
+        // Success!
+        setMsg($("registerMsg"), "✅ Super Admin account succesvol aangemaakt!");
+        
+        // Show success message and redirect
+        setTimeout(() => {
+          alert("✅ Super Admin account aangemaakt!\n\nJe kunt nu inloggen met:\nEmail: " + email + "\n\nJe wordt doorgestuurd naar de login pagina...");
+          window.location.href = "public/index.html";
+        }, 1000);
+
+      } catch (error) {
+        setMsg($("registerMsg"), "❌ " + error.message, true);
+        $("registerBtn").disabled = false;
+      }
+    }
+
+    $("registerBtn").addEventListener("click", register);
+
+    // Allow Enter key to submit
+    [$("email"), $("password"), $("passwordConfirm")].forEach(input => {
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          register();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

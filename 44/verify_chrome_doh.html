@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrome DoH Verificatie</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .status.ok {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .test-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    .test-btn:hover {
+      background: #0056b3;
+    }
+    .instructions {
+      background: #e7f3ff;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+      margin: 20px 0;
+    }
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 25px;
+    }
+    .instructions li {
+      margin: 8px 0;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔍 Chrome DoH Verificatie Tool</h1>
+    <p>Deze tool helpt je controleren of Chrome DNS-over-HTTPS (DoH) uit staat.</p>
+    
+    <div class="instructions">
+      <h3>📋 Instructies:</h3>
+      <ol>
+        <li>Open Chrome en ga naar: <code>chrome://settings/security</code></li>
+        <li>Zoek "Use secure DNS" (of "Gebruik beveiligde DNS")</li>
+        <li>Zet dit <strong>UIT</strong> of kies "With your current service provider"</li>
+        <li>Sluit Chrome <strong>volledig af</strong> (alle vensters)</li>
+        <li>Open Chrome opnieuw</li>
+        <li>Klik hieronder op "Test DoH Status"</li>
+      </ol>
+    </div>
+
+    <button class="test-btn" onclick="testDOH()">🧪 Test DoH Status</button>
+    <button class="test-btn" onclick="testDNS()">🌐 Test DNS Queries</button>
+    
+    <div id="results"></div>
+  </div>
+
+  <script>
+    async function testDOH() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="status warning">⏳ Testen...</div>';
+      
+      try {
+        // Try to detect DoH by checking if we can resolve DNS via known DoH providers
+        const dohProviders = [
+          'https://dns.google/resolve',
+          'https://cloudflare-dns.com/dns-query',
+          'https://dns.quad9.net/dns-query'
+        ];
+        
+        let dohDetected = false;
+        let detectedProvider = null;
+        
+        for (const provider of dohProviders) {
+          try {
+            const response = await fetch(`${provider}?name=google.com&type=A`, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/dns-json'
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.Answer && data.Answer.length > 0) {
+                dohDetected = true;
+                detectedProvider = provider;
+                break;
+              }
+            }
+          } catch (e) {
+            // Provider not accessible - good
+          }
+        }
+        
+        if (dohDetected) {
+          results.innerHTML = `
+            <div class="status error">
+              ❌ DoH GEDETECTEERD!
+              <br><br>
+              Chrome gebruikt nog steeds DNS-over-HTTPS via: <code>${detectedProvider}</code>
+              <br><br>
+              <strong>Actie vereist:</strong>
+              <ol style="text-align: left; display: inline-block;">
+                <li>Ga naar <code>chrome://settings/security</code></li>
+                <li>Zet "Use secure DNS" UIT</li>
+                <li>Sluit Chrome volledig af</li>
+                <li>Open Chrome opnieuw</li>
+                <li>Test opnieuw</li>
+              </ol>
+            </div>
+          `;
+        } else {
+          results.innerHTML = `
+            <div class="status ok">
+              ✅ DoH NIET GEDETECTEERD
+              <br><br>
+              Chrome gebruikt waarschijnlijk geen DNS-over-HTTPS meer.
+              <br><br>
+              <strong>Verificatie:</strong>
+              <ul style="text-align: left; display: inline-block;">
+                <li>Check Chrome settings: <code>chrome://settings/security</code></li>
+                <li>Zorg dat "Use secure DNS" UIT staat</li>
+                <li>Test met lege whitelist: niets zou moeten laden</li>
+              </ul>
+            </div>
+          `;
+        }
+      } catch (e) {
+        results.innerHTML = `
+          <div class="status warning">
+            ⚠️ Test kon niet uitgevoerd worden
+            <br><br>
+            Fout: ${e.message}
+            <br><br>
+            <strong>Handmatige verificatie:</strong>
+            <ol style="text-align: left; display: inline-block;">
+              <li>Open Chrome DevTools (F12)</li>
+              <li>Ga naar Network tab</li>
+              <li>Filter op: <code>doh</code> of <code>dns</code></li>
+              <li>Probeer een site te laden</li>
+              <li>Je zou GEEN DoH requests moeten zien</li>
+            </ol>
+          </div>
+        `;
+      }
+    }
+    
+    async function testDNS() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<div class="status warning">⏳ DNS queries testen...</div>';
+      
+      try {
+        // Test DNS resolution
+        const testDomain = 'google.com';
+        const startTime = Date.now();
+        
+        // Try to resolve via fetch (will use system DNS)
+        try {
+          await fetch(`https://${testDomain}`, { method: 'HEAD', mode: 'no-cors' });
+          const duration = Date.now() - startTime;
+          
+          results.innerHTML = `
+            <div class="status ok">
+              ✅ DNS Query Succesvol
+              <br><br>
+              Domain: <code>${testDomain}</code>
+              <br>
+              Response tijd: ${duration}ms
+              <br><br>
+              <strong>Let op:</strong> Als je VPN DNS gebruikt (10.10.0.1), zou deze query NXDOMAIN moeten geven als het domein niet in de whitelist staat.
+            </div>
+          `;
+        } catch (e) {
+          results.innerHTML = `
+            <div class="status warning">
+              ⚠️ DNS Query Faalde
+              <br><br>
+              Dit kan normaal zijn als:
+              <ul style="text-align: left; display: inline-block;">
+                <li>VPN DNS blokkeert het domein (niet in whitelist)</li>
+                <li>VPN is niet verbonden</li>
+                <li>DNS server is niet bereikbaar</li>
+              </ul>
+            </div>
+          `;
+        }
+      } catch (e) {
+        results.innerHTML = `
+          <div class="status error">
+            ❌ Test Error: ${e.message}
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

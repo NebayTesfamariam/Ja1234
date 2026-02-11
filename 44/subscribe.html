@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Porno-vrij Abonnement - 100% Blokkering</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #8b5cf6 100%);
+      color: white;
+      border-radius: 24px;
+      margin-bottom: 50px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(79, 125, 249, 0.4);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    .hero p {
+      font-size: 1.3em;
+      opacity: 0.95;
+    }
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin: 40px 0;
+    }
+    .plan-card {
+      background: var(--card);
+      border: 2px solid var(--line);
+      border-radius: 20px;
+      padding: 40px 30px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+    .plan-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .plan-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(79, 125, 249, 0.4), 0 0 30px rgba(79, 125, 249, 0.2);
+      border-color: var(--primary);
+    }
+    .plan-card:hover::before {
+      opacity: 1;
+    }
+    .plan-card.featured {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(79, 125, 249, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+      box-shadow: 0 10px 30px rgba(79, 125, 249, 0.3);
+    }
+    .plan-card.featured::before {
+      opacity: 1;
+    }
+    .plan-card.featured::before {
+      content: "POPULAIR";
+      position: absolute;
+      top: 20px;
+      right: -30px;
+      background: var(--primary);
+      color: white;
+      padding: 5px 40px;
+      transform: rotate(45deg);
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .plan-name {
+      font-size: 1.8em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--text-bright);
+    }
+    .plan-price {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 20px 0;
+    }
+    .plan-price span {
+      font-size: 0.35em;
+      color: var(--muted);
+      font-weight: 500;
+      display: block;
+      margin-top: 4px;
+    }
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+    .plan-features li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .plan-features li:last-child {
+      border-bottom: none;
+    }
+    .plan-features li::before {
+      content: "✓ ";
+      color: var(--success);
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .btn-subscribe {
+      width: 100%;
+      padding: 16px;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(79, 125, 249, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-subscribe::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .btn-subscribe:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+    .btn-subscribe:hover {
+      background: linear-gradient(135deg, #5d8aff 0%, #9d7af9 100%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(79, 125, 249, 0.5);
+    }
+    .guarantee {
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+      border: 2px solid var(--success);
+      border-radius: 20px;
+      margin: 50px 0;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .guarantee::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    .guarantee > * {
+      position: relative;
+      z-index: 1;
+    }
+    .guarantee h3 {
+      color: var(--success);
+      font-size: 1.5em;
+      margin-bottom: 15px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+    }
+    .feature-box {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+    .feature-box h4 {
+      color: var(--text-bright);
+      margin-bottom: 10px;
+    }
+    .signup-form {
+      max-width: 500px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 16px;
+      border: 2px solid var(--line);
+    }
+    .signup-form.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🛡️ Porno-vrij Internet</h1>
+      <p class="sub">100% Automatische Blokkering - Pornografische Content wordt NOOIT getoond</p>
+    </header>
+
+    <section class="hero">
+      <h1>🛡️ Bescherm jezelf en je gezin</h1>
+      <p>Automatische 100% blokkering van pornografische content op alle devices</p>
+      <p style="font-size: 1em; margin-top: 20px; opacity: 0.9;">
+        Werkt op Wi-Fi, 4G en 5G • Per device beheer • Direct actief na aanmelding
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>📋 Kies je Abonnement</h2>
+      <p style="text-align: center; color: var(--muted); margin-bottom: 30px;">
+        Alle plannen bieden 100% blokkering van pornografische content. Alleen het aantal devices verschilt.
+      </p>
+
+      <div class="plans">
+        <div class="plan-card">
+          <div class="plan-name">Basic</div>
+          <div class="plan-price">€9.99<span>/maand</span></div>
+          <ul class="plan-features">
+            <li>2 Devices</li>
+            <li>100% Pornografische Blokkering</li>
+            <li>Automatische Updates</li>
+            <li>24/7 Bescherming</li>
+            <li>Werkt op Wi-Fi, 4G, 5G</li>
+          </ul>
+          <button class="btn-subscribe" onclick="showSignup('basic')">Abonnement Aansluiten</button>
+        </div>
+
+        <div class="plan-card featured">
+          <div class="plan-name">Family</div>
+          <div class="plan-price">€19.99<span>/maand</span></div>
+          <ul class="plan-features">
+            <li>5 Devices</li>
+            <li>100% Pornografische Blokkering</li>
+            <li>Automatische Updates</li>
+            <li>24/7 Bescherming</li>
+            <li>Werkt op Wi-Fi, 4G, 5G</li>
+            <li>Per Device Beheer</li>
+          </ul>
+          <button class="btn-subscribe" onclick="showSignup('family')">Abonnement Aansluiten</button>
+        </div>
+
+        <div class="plan-card">
+          <div class="plan-name">Premium</div>
+          <div class="plan-price">€29.99<span>/maand</span></div>
+          <ul class="plan-features">
+            <li>10 Devices</li>
+            <li>100% Pornografische Blokkering</li>
+            <li>Automatische Updates</li>
+            <li>24/7 Bescherming</li>
+            <li>Werkt op Wi-Fi, 4G, 5G</li>
+            <li>Per Device Beheer</li>
+            <li>Prioriteit Support</li>
+          </ul>
+          <button class="btn-subscribe" onclick="showSignup('premium')">Abonnement Aansluiten</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="guarantee">
+      <h3>🛡️ 100% Garantie</h3>
+      <p style="font-size: 1.1em; line-height: 1.8;">
+        <strong>Pornografische content wordt NOOIT getoond.</strong><br>
+        Direct na aanmelding wordt alle pornografische content automatisch geblokkeerd op je devices.<br>
+        Werkt op netwerkniveau - niet alleen in de browser, maar overal.<br>
+        <strong>🌐 Werkt op alle browsers:</strong> Chrome, Firefox, Safari, Edge - alle browsers worden geblokkeerd.<br>
+        <strong>🔍 URL filtering:</strong> Blokkeert ook pornografische content via normale sites (embedded content, links).<br>
+        <strong>🌍 Meertalige detectie:</strong> Werkt in <strong>ALLE GOOGLE TRANSLATE TALEN</strong> - 249 talen ondersteund! Volledige wereldwijde dekking: alle talen die Google Translate ondersteunt worden automatisch gedetecteerd en geblokkeerd!
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>✨ Hoe het werkt</h2>
+      <div class="features-grid">
+        <div class="feature-box">
+          <h4>🚀 Direct Actief</h4>
+          <p>Na aanmelding wordt je abonnement direct actief. Pornografische content wordt meteen geblokkeerd.</p>
+        </div>
+        <div class="feature-box">
+          <h4>🛡️ 100% Blokkering</h4>
+          <p>Pornografische sites worden permanent geblokkeerd. Kan niet worden uitgeschakeld.</p>
+        </div>
+        <div class="feature-box">
+          <h4>📱 Alle Devices</h4>
+          <p>Werkt op telefoon, tablet, laptop - alle devices die je toevoegt.</p>
+        </div>
+        <div class="feature-box">
+          <h4>🌐 Overal & Alle Browsers</h4>
+          <p>Werkt op Wi-Fi, 4G en 5G. Blokkeert pornografische content in Chrome, Firefox, Safari, Edge - alle browsers en via normale sites.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signup Form -->
+    <section class="card signup-form hidden" id="signupForm">
+      <h2>📝 Abonnement Aansluiten</h2>
+      <div id="signupMsg" class="msg"></div>
+      
+      <div class="row">
+        <input id="signupEmail" type="email" placeholder="E-mailadres" />
+      </div>
+      <div class="row">
+        <input id="signupPassword" type="password" placeholder="Wachtwoord (min. 6 karakters)" />
+      </div>
+      <div class="row">
+        <input id="signupPasswordConfirm" type="password" placeholder="Bevestig wachtwoord" />
+      </div>
+      <p class="hint" style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); margin: 15px 0;">
+        <strong>🤖 Volledig Automatisch - Slechts 3 Velden!</strong><br>
+        ✅ Je device wordt automatisch gedetecteerd (iPhone, Android, PC, etc.)<br>
+        ✅ Device wordt automatisch geregistreerd<br>
+        ✅ WireGuard key en IP adres worden automatisch gegenereerd<br>
+        ✅ Alles werkt direct na aanmelding - klik op "Abonnement Aansluiten" en klaar!<br>
+        <strong>🛡️ Pornografische content wordt direct geblokkeerd op je device!</strong>
+      </p>
+      
+      <div class="row" style="margin-top: 20px;">
+        <button id="signupBtn" class="btn-subscribe">Abonnement Aansluiten</button>
+      </div>
+      
+      <p style="text-align: center; margin-top: 20px; color: var(--muted); font-size: 0.9em;">
+        Door te registreren ga je akkoord met onze voorwaarden.<br>
+        <strong>✅ Alles automatisch:</strong> Account → Abonnement → Device → Direct beschermd!<br>
+        <strong>🛡️ Pornografische content wordt direct geblokkeerd - geen extra stappen nodig!</strong>
+      </p>
+    </section>
+
+    <footer>
+      <div class="small">
+        <strong>🛡️ Porno-vrij Platform</strong> | 100% Automatische Blokkering<br>
+        Pornografische content wordt NOOIT getoond - permanente blokkering op netwerkniveau
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const API = (path) => "api/" + path;
+    const $ = (id) => document.getElementById(id);
+    let selectedPlan = null;
+
+    function setMsg(el, text) {
+      el.textContent = text || "";
+    }
+
+    function showSignup(plan) {
+      selectedPlan = plan;
+      const formEl = $("signupForm");
+      const msgEl = $("signupMsg");
+      if (formEl) {
+        formEl.classList.remove("hidden");
+        formEl.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (msgEl) setMsg(msgEl, "");
+    }
+
+    async function signup() {
+      const msgEl = $("signupMsg");
+      if (msgEl) setMsg(msgEl, "");
+      
+      // Null-safe element access
+      const emailEl = $("signupEmail");
+      const passwordEl = $("signupPassword");
+      const passwordConfirmEl = $("signupPasswordConfirm");
+      const nameEl = $("signupName");
+      
+      if (!emailEl || !passwordEl || !passwordConfirmEl) {
+        if (msgEl) setMsg(msgEl, "Formulier velden niet gevonden");
+        console.error("Formulier velden niet gevonden");
+        return;
+      }
+      
+      const email = emailEl.value.trim();
+      const password = passwordEl.value;
+      const passwordConfirm = passwordConfirmEl.value;
+      const name = nameEl ? nameEl.value.trim() : "";
+
+      if (!email || !password) {
+        if (msgEl) setMsg(msgEl, "E-mail en wachtwoord zijn verplicht");
+        return;
+      }
+
+      if (password.length < 6) {
+        if (msgEl) setMsg(msgEl, "Wachtwoord moet minimaal 6 karakters lang zijn");
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        if (msgEl) setMsg(msgEl, "Wachtwoorden komen niet overeen");
+        return;
+      }
+
+      if (!selectedPlan) {
+        if (msgEl) setMsg(msgEl, "Selecteer eerst een abonnement");
+        return;
+      }
+
+      try {
+        // Try direct registration first (without Stripe)
+        if (msgEl) setMsg(msgEl, "Account aanmaken...");
+        
+        const res = await fetch(API("register.php"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            email, 
+            password, 
+            plan: selectedPlan,
+            name: name || ""
+          })
+        });
+        
+        const data = await res.json();
+
+        if (!res.ok) {
+          // If registration fails, try Stripe checkout as fallback
+          if (res.status === 500 && data.message && data.message.includes("Stripe")) {
+            if (msgEl) setMsg(msgEl, "Stripe checkout voorbereiden...");
+            
+            const stripeRes = await fetch(API("stripe_create_checkout.php"), {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                email, 
+                password, 
+                plan: selectedPlan
+              })
+            });
+            const stripeData = await stripeRes.json();
+
+            if (!stripeRes.ok) {
+              throw new Error(stripeData.message || "Registratie mislukt");
+            }
+
+            // Redirect to Stripe Checkout
+            if (stripeData.checkout_url) {
+              window.location.href = stripeData.checkout_url;
+              return;
+            } else {
+              throw new Error("Geen checkout URL ontvangen");
+            }
+          } else {
+            throw new Error(data.message || "Registratie mislukt");
+          }
+        }
+
+        // Registration successful!
+        const successMsg = "✅ Account en abonnement aangemaakt!";
+        if (msgEl) setMsg(msgEl, successMsg);
+        
+        // Store token if provided
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        }
+        
+        // Auto-download WireGuard config if device was created
+        if (data.device_id && data.wg_public_key) {
+          setTimeout(() => {
+            if (msgEl) setMsg(msgEl, "📥 WireGuard config downloaden...");
+            
+            // Download WireGuard config automatically with token
+            const tokenParam = data.token ? `&token=${encodeURIComponent(data.token)}` : '';
+            const configUrl = `api/get_wireguard_config.php?device_id=${data.device_id}${tokenParam}`;
+            
+            // Use fetch to get config, then trigger download
+            fetch(configUrl, {
+              headers: {
+                'Authorization': data.token ? `Bearer ${data.token}` : ''
+              }
+            })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Config download failed');
+              }
+              return response.blob();
+            })
+            .then(blob => {
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `${data.device_name || 'wireguard'}.conf`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              window.URL.revokeObjectURL(url);
+              
+              if (msgEl) setMsg(msgEl, "✅ WireGuard config gedownload! Importeer in WireGuard app.");
+            })
+            .catch(error => {
+              console.error('Download error:', error);
+              if (msgEl) setMsg(msgEl, "⚠️ Download mislukt. Je kunt de config later downloaden vanuit het control panel.");
+            });
+            
+            // Show instructions with auto-activate button
+            setTimeout(() => {
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+              const wireguardDeepLink = `wireguard://`; // Will be filled with config if available
+              
+              const instructions = `
+                <div style="background: rgba(79, 125, 249, 0.1); padding: 20px; border-radius: 12px; border: 2px solid rgba(79, 125, 249, 0.3); margin: 20px 0;">
+                  <h3 style="margin-top: 0;">📱 VPN Automatisch Activeren:</h3>
+                  <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li><strong>WireGuard config is gedownload</strong> (${data.device_name || 'wireguard'}.conf)</li>
+                    ${isMobile ? 
+                      `<li><strong>Klik op de knop hieronder</strong> om WireGuard app te openen</li>
+                       <li><strong>In WireGuard app:</strong> Klik "+" → "Create from file" → Selecteer gedownloade file</li>
+                       <li><strong>Activeer VPN verbinding</strong> in WireGuard app</li>` :
+                      `<li><strong>Windows/Mac/Linux:</strong> Importeer .conf file in WireGuard client</li>
+                       <li><strong>Activeer VPN verbinding</strong> in WireGuard client</li>`
+                    }
+                  </ol>
+                  ${isMobile ? `
+                    <button onclick="window.location.href='wireguard://';" 
+                      style="width: 100%; margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #4f7df9 0%, #8b5cf6 100%); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 1.1em; cursor: pointer;">
+                      🔗 Open WireGuard App Nu
+                    </button>
+                  ` : ''}
+                  <p style="margin: 15px 0 0 0;"><strong>🛡️ Pornografische content wordt direct geblokkeerd zodra VPN actief is!</strong></p>
+                  <p style="margin: 10px 0 0 0;">
+                    <a href="public/index.html" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: linear-gradient(135deg, #4f7df9 0%, #8b5cf6 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                      → Ga naar Control Panel
+                    </a>
+                  </p>
+                </div>
+              `;
+              if (msgEl) {
+                msgEl.innerHTML = instructions;
+              }
+            }, 1000);
+          }, 500);
+        } else {
+          // No device created, just redirect
+          setTimeout(() => {
+            window.location.href = "public/index.html";
+          }, 2000);
+        }
+
+      } catch (e) {
+        if (msgEl) setMsg(msgEl, "❌ " + e.message);
+        console.error("Signup error:", e);
+      }
+    }
+
+    $("signupBtn").onclick = signup;
+  </script>
+</body>
+</html>
+

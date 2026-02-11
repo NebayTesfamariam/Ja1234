@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.nebay.pornfree</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Applications/XAMPP/xamppfiles/htdocs/44/start_pornfree_system.sh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/44/logs/pornfree.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/44/logs/pornfree.error.log</string>
+    <key>WorkingDirectory</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/44</string>
+</dict>
+</plist>

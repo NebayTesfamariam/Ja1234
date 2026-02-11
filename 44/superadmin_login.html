@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Super Admin Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .superadmin-badge {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .login-container {
+      max-width: 500px;
+      margin: 100px auto;
+      padding: 40px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+    .login-container h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="login-container">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <span class="superadmin-badge">🔴 SUPER ADMIN</span>
+      </div>
+      <h1>🔐 Super Admin Login</h1>
+      <p class="hint" style="text-align: center; margin-bottom: 30px; color: var(--muted);">
+        Directe toegang tot het Super Admin Panel
+      </p>
+      
+      <div class="row">
+        <input id="email" type="email" placeholder="E-mailadres" value="admin@test.com" />
+      </div>
+      <div class="row">
+        <input id="password" type="password" placeholder="Wachtwoord" value="123456" />
+      </div>
+      <div class="row">
+        <button id="loginBtn" class="primary" style="width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold;">
+          🔐 Inloggen als Super Admin
+        </button>
+      </div>
+      
+      <div id="loginMsg" class="msg" style="margin-top: 20px;"></div>
+      
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line);">
+        <p class="hint" style="text-align: center; font-size: 0.9em;">
+          <a href="public/index.html" style="color: var(--primary); text-decoration: none;">
+            ← Terug naar gebruikers login
+          </a>
+        </p>
+        <p class="hint" style="text-align: center; font-size: 0.85em; margin-top: 10px; color: var(--muted);">
+          💡 <strong>Geen admin rechten?</strong><br>
+          Gebruik: <code>api/make_admin.php?email=jouw@email.com</code><br>
+          Of registreer als super admin: <a href="register_super_admin.html" style="color: var(--primary);">Registreer Super Admin</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = (path) => "api/" + path;
+    const $ = (id) => document.getElementById(id);
+    
+    let token = localStorage.getItem("token") || "";
+    
+    function setMsg(el, text, type) {
+      if (!el) return;
+      el.textContent = text || "";
+      el.className = `msg ${type || ''}`;
+    }
+    
+    async function apiFetch(path, opts = {}) {
+      token = localStorage.getItem("token") || "";
+      
+      const headers = opts.headers || {};
+      headers["Content-Type"] = "application/json";
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      
+      const res = await fetch(API(path), { ...opts, headers });
+      const data = await res.json().catch(() => ({}));
+      
+      if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          throw new Error(data.message || "Sessie verlopen");
+        }
+        throw new Error(data.message || `HTTP ${res.status}`);
+      }
+      return data;
+    }
+    
+    async function login() {
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      
+      if (!email || !password) {
+        setMsg($("loginMsg"), "Vul email en wachtwoord in", "error");
+        return;
+      }
+      
+      try {
+        setMsg($("loginMsg"), "⏳ Inloggen...");
+        $("loginBtn").disabled = true;
+        
+        const response = await fetch("api/login.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
+        
+        let data;
+        try {
+          data = await response.json();
+        } catch (e) {
+          throw new Error("Server response error: " + response.status + " " + response.statusText);
+        }
+        
+        if (!response.ok) {
+          throw new Error(data.message || "Login mislukt (HTTP " + response.status + ")");
+        }
+        
+        if (!data.token) {
+          throw new Error("Geen token ontvangen van server");
+        }
+        
+        token = data.token;
+        localStorage.setItem("token", token);
+        console.log("Login successful, token saved");
+        
+        // Check if user is admin
+        try {
+          const adminCheck = await apiFetch("admin_check.php");
+          if (adminCheck.is_admin && adminCheck.user) {
+            // Redirect to admin panel
+            setMsg($("loginMsg"), "✅ Login succesvol! Redirect naar admin panel...", "success");
+            setTimeout(() => {
+              window.location.href = "admin/index.html";
+            }, 500);
+          } else {
+            setMsg($("loginMsg"), "❌ Geen admin rechten. Alleen super admins kunnen hier inloggen.", "error");
+            localStorage.removeItem("token");
+            $("loginBtn").disabled = false;
+          }
+        } catch (adminError) {
+          // Admin check failed - user is not admin
+          setMsg($("loginMsg"), "❌ Geen admin rechten. Alleen super admins kunnen hier inloggen.", "error");
+          localStorage.removeItem("token");
+          $("loginBtn").disabled = false;
+        }
+      } catch (e) {
+        console.error("Login error:", e);
+        setMsg($("loginMsg"), "❌ " + (e.message || "Login mislukt"), "error");
+        $("loginBtn").disabled = false;
+      }
+    }
+    
+    $("loginBtn").onclick = login;
+    
+    // Enter key to login
+    $("password").onkeypress = (e) => {
+      if (e.key === "Enter") login();
+    };
+    $("email").onkeypress = (e) => {
+      if (e.key === "Enter") login();
+    };
+    
+    // Check if already logged in (only if we have a valid token)
+    // Don't check if token is empty or too short (invalid)
+    if (token && token.length > 10) {
+      apiFetch("admin_check.php").then(data => {
+        if (data.is_admin && data.user) {
+          // User is admin, redirect to admin panel
+          window.location.href = "admin/index.html";
+        } else {
+          // Not admin, remove token silently
+          localStorage.removeItem("token");
+          token = "";
+        }
+      }).catch((e) => {
+        // Not admin, token invalid, or not authenticated - remove token silently
+        // This is normal if user is not logged in yet - don't show errors
+        localStorage.removeItem("token");
+        token = "";
+        // Silently fail - user just needs to login
+      });
+    }
+  </script>
+</body>
+</html>

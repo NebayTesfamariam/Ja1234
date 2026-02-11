@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Simple Test</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      padding: 40px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+    }
+    h1 { font-size: 3em; margin: 20px 0; }
+    .box {
+      background: rgba(255,255,255,0.2);
+      padding: 30px;
+      border-radius: 15px;
+      margin: 20px auto;
+      max-width: 600px;
+      backdrop-filter: blur(10px);
+    }
+    .success { color: #4CAF50; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>✅ Site Werkt!</h1>
+  <div class="box">
+    <p class="success">Als je dit ziet, werkt de server perfect!</p>
+    <p>Server: Apache/XAMPP</p>
+    <p>Status: Online</p>
+    <hr style="border-color: rgba(255,255,255,0.3); margin: 20px 0;">
+    <p><a href="index.html" style="color: white; text-decoration: underline;">Ga naar hoofdpagina →</a></p>
+    <p><a href="debug.html" style="color: white; text-decoration: underline;">Ga naar debug pagina →</a></p>
+  </div>
+  
+  <script>
+    console.log('✅ Simple test page loaded');
+    document.body.style.opacity = '0';
+    setTimeout(() => {
+      document.body.style.transition = 'opacity 0.5s';
+      document.body.style.opacity = '1';
+    }, 100);
+  </script>
+</body>
+</html>

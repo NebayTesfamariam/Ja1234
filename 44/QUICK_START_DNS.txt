@@ -1,0 +1,19 @@
+🚨 QUICK FIX: START DNS SERVER
+
+Kopieer en plak dit commando in Terminal:
+
+cd /Applications/XAMPP/xamppfiles/htdocs/44 && sudo python3 dns_whitelist_server.py
+
+Je wordt gevraagd om je wachtwoord in te voeren.
+Type je wachtwoord (je ziet niets typen - dat is normaal!) en druk ENTER.
+
+Laat Terminal open staan - DNS server draait nu!
+
+✅ VERIFICATIE:
+Open nieuwe Terminal en voer uit:
+ps aux | grep dns_whitelist_server | grep -v grep
+
+Moet proces tonen!
+
+📋 VOOR AUTOMATISCH STARTEN BIJ BOOT:
+cd /Applications/XAMPP/xamppfiles/htdocs/44 && ./install_dns_launchdaemon.sh
