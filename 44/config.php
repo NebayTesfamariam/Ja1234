@@ -112,11 +112,11 @@ if ($is_production) {
   if (!isset($DB_PASS)) $DB_PASS = "JE_ECHTE_DB_WACHTWOORD"; // 🔴 VERPLICHT - Update this!
   if (!isset($DB_NAME)) $DB_NAME = "u402299403_ja1234";
 } else {
-  // XAMPP Default Settings (Development)
-  $DB_HOST = "localhost";
-  $DB_USER = "root";
-  $DB_PASS = "";
-  $DB_NAME = "pornfree";
+  // Development: env vars override defaults (Kubuntu/Ubuntu often use a dedicated DB user)
+  $DB_HOST = getenv('DB_HOST') ?: "localhost";
+  $DB_USER = getenv('DB_USER') ?: "root";
+  $DB_PASS = getenv('DB_PASS') ?: "";
+  $DB_NAME = getenv('DB_NAME') ?: "pornfree";
 }
 
 /* =====================

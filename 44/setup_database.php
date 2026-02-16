@@ -11,11 +11,11 @@ error_reporting(E_ALL);
 echo "🗄️  Database Setup\n";
 echo "==================\n\n";
 
-// Database configuration
-$DB_HOST = "localhost";
-$DB_USER = "root";
-$DB_PASS = "";  // XAMPP default
-$DB_NAME = "pornfree";
+// Database configuration (env vars for Kubuntu/Ubuntu where root often has a password)
+$DB_HOST = getenv('DB_HOST') ?: "localhost";
+$DB_USER = getenv('DB_USER') ?: "root";
+$DB_PASS = getenv('DB_PASS') ?: "";
+$DB_NAME = getenv('DB_NAME') ?: "pornfree";
 
 try {
     // Connect without database first
@@ -41,44 +41,39 @@ try {
         echo "📋 Reading SQL file: $sql_file\n";
         $sql = file_get_contents($sql_file);
         
+        // Strip whole-line comments (-- ...) so chunks starting with comments still run
+        $sql = preg_replace('/^\s*--[^\n]*\n/m', "\n", $sql);
         // Split by semicolon and execute each statement
-        $statements = array_filter(
-            array_map('trim', explode(';', $sql)),
-            function($stmt) {
-                return !empty($stmt) && 
-                       !preg_match('/^--/', $stmt) && 
-                       !preg_match('/^\/\*/', $stmt);
-            }
-        );
+        $chunks = array_map('trim', explode(';', $sql));
         
         $tables_created = 0;
-        foreach ($statements as $statement) {
+        foreach ($chunks as $statement) {
             $statement = trim($statement);
             if (empty($statement)) continue;
+            // Skip chunks that are only comments or empty after trim
+            if (preg_match('/^\/\*/', $statement)) continue;
             
-            // Skip comments
-            if (strpos($statement, '--') === 0) continue;
-            if (strpos($statement, '/*') === 0) continue;
-            
-            // Normalize whitespace for better regex matching
             $normalized = preg_replace('/\s+/', ' ', $statement);
+            if (strlen($normalized) < 10) continue;
             
             try {
                 $conn->query($statement);
                 
-                // Better regex to match CREATE TABLE statements (handles multi-line)
                 if (preg_match('/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"]?(\w+)[`"]?/i', $normalized, $matches)) {
                     $table_name = $matches[1] ?? 'unknown';
-                    // Only show if it's a real table name (not single character)
                     if (strlen($table_name) > 1) {
                         echo "  ✅ Table '$table_name' created/verified\n";
                         $tables_created++;
                     }
+                } elseif (preg_match('/^INSERT\s+/i', $normalized)) {
+                    echo "  ✅ Data inserted\n";
+                } elseif (preg_match('/^CREATE\s+INDEX/i', $normalized)) {
+                    echo "  ✅ Index created\n";
                 }
             } catch (Exception $e) {
-                // Ignore "table already exists" errors
-                if (strpos($e->getMessage(), 'already exists') === false && 
-                    strpos($e->getMessage(), 'Duplicate key') === false) {
+                if (strpos($e->getMessage(), 'already exists') === false &&
+                    strpos($e->getMessage(), 'Duplicate key') === false &&
+                    strpos($e->getMessage(), 'Duplicate entry') === false) {
                     echo "  ⚠️  Warning: " . $e->getMessage() . "\n";
                 }
             }
