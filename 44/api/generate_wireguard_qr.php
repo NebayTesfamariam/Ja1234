@@ -59,10 +59,13 @@ if ($device['status'] !== 'active') {
   json_out(['message' => 'Device is not active'], 403);
 }
 
-// VPN Server Configuration
-$VPN_SERVER_ENDPOINT = getenv('VPN_SERVER_ENDPOINT') ?: 'your-vpn-server.com:51820';
-$VPN_SERVER_PUBLIC_KEY = getenv('VPN_SERVER_PUBLIC_KEY') ?: 'YOUR_VPN_SERVER_PUBLIC_KEY';
-$VPN_DNS = getenv('VPN_DNS') ?: '10.10.0.1';
+// VPN Server Configuration (same as get_wireguard_config.php)
+if (file_exists(__DIR__ . '/../config_vpn.php')) {
+  require __DIR__ . '/../config_vpn.php';
+}
+$VPN_SERVER_ENDPOINT = $VPN_SERVER_ENDPOINT ?? getenv('VPN_SERVER_ENDPOINT') ?: 'your-vpn-server.com:51820';
+$VPN_SERVER_PUBLIC_KEY = $VPN_SERVER_PUBLIC_KEY ?? getenv('VPN_SERVER_PUBLIC_KEY') ?: 'YOUR_VPN_SERVER_PUBLIC_KEY';
+$VPN_DNS = $VPN_DNS ?? getenv('VPN_DNS') ?: '10.10.0.1';
 
 // Client IP from device
 $client_ip = $device['wg_ip'];

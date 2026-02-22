@@ -378,8 +378,19 @@
     </footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
   <script>
     const API = (path) => "api/" + path;
+    function uint8ArrayToBase64(u8) {
+      let s = ''; for (let i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]);
+      return btoa(s);
+    }
+    function generateWireGuardKeyPair() {
+      if (typeof nacl === 'undefined') return null;
+      const kp = nacl.box.keyPair();
+      return { publicKeyBase64: uint8ArrayToBase64(kp.publicKey), privateKeyBase64: uint8ArrayToBase64(kp.secretKey) };
+    }
+    const WG_CONFIG_PLACEHOLDER = 'PrivateKey = YOUR_PRIVATE_KEY_HERE';
     const $ = (id) => document.getElementById(id);
     let selectedPlan = null;
 
@@ -497,28 +508,38 @@
           localStorage.setItem('token', data.token);
         }
         
-        // Auto-download WireGuard config if device was created
+        // Auto-download WireGuard config if device was created (client-side key: private key never sent to server)
         if (data.device_id && data.wg_public_key) {
-          setTimeout(() => {
-            if (msgEl) setMsg(msgEl, "📥 WireGuard config downloaden...");
-            
-            // Download WireGuard config automatically with token
-            const tokenParam = data.token ? `&token=${encodeURIComponent(data.token)}` : '';
-            const configUrl = `api/get_wireguard_config.php?device_id=${data.device_id}${tokenParam}`;
-            
-            // Use fetch to get config, then trigger download
-            fetch(configUrl, {
-              headers: {
-                'Authorization': data.token ? `Bearer ${data.token}` : ''
+          setTimeout(async () => {
+            if (msgEl) setMsg(msgEl, "📥 WireGuard config voorbereiden...");
+            try {
+              const pair = generateWireGuardKeyPair();
+              if (!pair) {
+                if (msgEl) setMsg(msgEl, "⚠️ Config kan niet worden gegenereerd. Download later vanuit het control panel.");
+                return;
               }
-            })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error('Config download failed');
+              const updateResp = await fetch(API("update_device_wg_key.php"), {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  device_id: data.device_id,
+                  wg_public_key: pair.publicKeyBase64,
+                  token: data.token || undefined
+                })
+              });
+              if (!updateResp.ok) {
+                const errData = await updateResp.json().catch(() => ({}));
+                throw new Error(errData.message || 'Key update failed');
               }
-              return response.blob();
-            })
-            .then(blob => {
+              const tokenParam = data.token ? `&token=${encodeURIComponent(data.token)}` : '';
+              const configUrl = API(`get_wireguard_config.php?device_id=${data.device_id}${tokenParam}`);
+              const resp = await fetch(configUrl, {
+                headers: { 'Authorization': data.token ? `Bearer ${data.token}` : '' }
+              });
+              if (!resp.ok) throw new Error('Config download failed');
+              let configText = await resp.text();
+              configText = configText.replace(WG_CONFIG_PLACEHOLDER, 'PrivateKey = ' + pair.privateKeyBase64);
+              const blob = new Blob([configText], { type: 'text/plain' });
               const url = window.URL.createObjectURL(blob);
               const link = document.createElement('a');
               link.href = url;
@@ -527,13 +548,11 @@
               link.click();
               document.body.removeChild(link);
               window.URL.revokeObjectURL(url);
-              
               if (msgEl) setMsg(msgEl, "✅ WireGuard config gedownload! Importeer in WireGuard app.");
-            })
-            .catch(error => {
-              console.error('Download error:', error);
+            } catch (err) {
+              console.error('Download error:', err);
               if (msgEl) setMsg(msgEl, "⚠️ Download mislukt. Je kunt de config later downloaden vanuit het control panel.");
-            });
+            }
             
             // Show instructions with auto-activate button
             setTimeout(() => {

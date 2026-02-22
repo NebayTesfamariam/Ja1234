@@ -312,22 +312,48 @@ async function selectDevice(id) {
   }
 }
 
+// --- Client-side WireGuard key generation (private key never sent to server) ---
+function uint8ArrayToBase64(u8) {
+  let s = '';
+  for (let i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]);
+  return btoa(s);
+}
+
+function generateWireGuardKeyPair() {
+  if (typeof nacl === 'undefined') throw new Error('WireGuard key generation requires TweetNaCl. Refresh the page and try again.');
+  const kp = nacl.box.keyPair();
+  return {
+    publicKeyBase64: uint8ArrayToBase64(kp.publicKey),
+    privateKeyBase64: uint8ArrayToBase64(kp.secretKey)
+  };
+}
+
+async function ensureDeviceKeyPair(deviceId) {
+  const storageKey = 'wg_private_' + deviceId;
+  let privateKeyBase64 = sessionStorage.getItem(storageKey);
+  if (privateKeyBase64) return privateKeyBase64;
+  const pair = generateWireGuardKeyPair();
+  await apiFetch('update_device_wg_key.php', {
+    method: 'POST',
+    body: JSON.stringify({ device_id: deviceId, wg_public_key: pair.publicKeyBase64 })
+  });
+  sessionStorage.setItem(storageKey, pair.privateKeyBase64);
+  return pair.privateKeyBase64;
+}
+
+const WG_CONFIG_PLACEHOLDER = 'PrivateKey = YOUR_PRIVATE_KEY_HERE';
+
 async function downloadWireguardConfig(deviceId, deviceName) {
   try {
+    const privateKeyBase64 = await ensureDeviceKeyPair(deviceId);
     const configUrl = API(`get_wireguard_config.php?device_id=${deviceId}`);
-    
-    // Fetch config with authentication
     const response = await fetch(configUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-    
-    if (!response.ok) {
-      throw new Error('Config download failed');
-    }
-    
-    const blob = await response.blob();
+    if (!response.ok) throw new Error('Config download failed');
+    let configText = await response.text();
+    configText = configText.replace(WG_CONFIG_PLACEHOLDER, 'PrivateKey = ' + privateKeyBase64);
+    const blob = new Blob([configText], { type: 'text/plain' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -336,16 +362,11 @@ async function downloadWireguardConfig(deviceId, deviceName) {
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
-    
     Toast.success(`✅ WireGuard config gedownload: ${deviceName || 'device'}.conf`);
-    
-    // Show auto-activate instructions
-    setTimeout(() => {
-      showAutoActivateInstructions(deviceId, deviceName);
-    }, 1000);
+    setTimeout(() => showAutoActivateInstructions(deviceId, deviceName), 1000);
   } catch (error) {
     console.error('WireGuard config download error:', error);
-    // Don't show error - just log it (user can download manually)
+    Toast.error(error.message || 'Config download mislukt');
   }
 }
 
@@ -570,17 +591,52 @@ async function addDevice() {
     }
   }
 
-  // If WireGuard key or IP not provided, use auto-register instead
+  const btn = $("addDeviceBtn");
+  const originalText = btn.textContent;
+
+  // No key/IP: generate key client-side and add device (private key never sent to server)
   if (!wg_public_key || !wg_ip) {
+    if (typeof nacl !== 'undefined') {
+      try {
+        btn.disabled = true;
+        btn.textContent = "⏳ Toevoegen...";
+        btn.classList.add("loading");
+        const pair = generateWireGuardKeyPair();
+        const data = await apiFetch("add_device.php", {
+          method: "POST",
+          body: JSON.stringify({ name, wg_public_key: pair.publicKeyBase64 })
+        });
+        const deviceId = data.device_id;
+        if (deviceId) {
+          sessionStorage.setItem('wg_private_' + deviceId, pair.privateKeyBase64);
+          $("devName").value = "";
+          $("devKey").value = "";
+          $("devIp").value = "";
+          Toast.success(`Device "${data.device_name || name}" toegevoegd`);
+          await loadDevices();
+          await downloadWireguardConfig(deviceId, data.device_name || name);
+        } else if (data.status === 'exists') {
+          Toast.info(data.message || 'Device bestaat al');
+          await loadDevices();
+        } else {
+          Toast.info(data.message || 'Device toegevoegd');
+          await loadDevices();
+        }
+      } catch (e) {
+        Toast.error(e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        btn.classList.remove("loading");
+      }
+      return;
+    }
     Toast.info("Gebruik automatische registratie - WireGuard key en IP worden automatisch gegenereerd");
-    // Use auto-register instead
     $("devName").value = name;
     await autoAddDevice();
     return;
   }
 
-  const btn = $("addDeviceBtn");
-  const originalText = btn.textContent;
   try {
     btn.disabled = true;
     btn.textContent = "⏳ Toevoegen...";
@@ -592,10 +648,8 @@ async function addDevice() {
     });
 
     if (data.status === 'exists') {
-      // Device already exists
       Toast.info(data.message || 'Device bestaat al - dit device is al geregistreerd voor je account');
     } else {
-      // New device created
       $("devName").value = "";
       $("devKey").value = "";
       $("devIp").value = "";

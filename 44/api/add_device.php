@@ -7,8 +7,8 @@ $name = trim((string)($body['name'] ?? ''));
 $wg_public_key = trim((string)($body['wg_public_key'] ?? ''));
 $wg_ip = trim((string)($body['wg_ip'] ?? ''));
 
-if ($name === '' || $wg_public_key === '' || $wg_ip === '') {
-  json_out(['message' => 'name, wg_public_key, wg_ip required'], 422);
+if ($name === '' || $wg_public_key === '') {
+  json_out(['message' => 'name and wg_public_key required'], 422);
 }
 
 // Basic validation
@@ -18,7 +18,19 @@ if (strlen($name) > 255) {
 if (strlen($wg_public_key) > 255) {
   json_out(['message' => 'WireGuard key is te lang'], 422);
 }
-if (!filter_var($wg_ip, FILTER_VALIDATE_IP)) {
+// Assign next available VPN IP when wg_ip omitted (client-side key flow)
+if ($wg_ip === '') {
+  $stmt = $conn->prepare("SELECT wg_ip FROM devices WHERE wg_ip LIKE '10.10.0.%' ORDER BY wg_ip DESC LIMIT 1");
+  $stmt->execute();
+  $last = $stmt->get_result()->fetch_assoc();
+  $ip_num = 10;
+  if ($last) {
+    $parts = explode('.', $last['wg_ip']);
+    $ip_num = (int)($parts[3] ?? 10) + 1;
+    if ($ip_num > 254) $ip_num = 10;
+  }
+  $wg_ip = "10.10.0.{$ip_num}";
+} elseif (!filter_var($wg_ip, FILTER_VALIDATE_IP)) {
   json_out(['message' => 'Ongeldig IP adres'], 422);
 }
 
