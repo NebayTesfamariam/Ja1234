@@ -30,9 +30,10 @@ if ($result) {
   $stmt->bind_param("ii", $id, $user['id']);
   $stmt->execute();
   
-  // Clear cache for this device
+  // Clear cache for this device (dashboard + DNS server)
   $cache_key = SimpleCache::key('whitelist', $device_id, $user['id']);
   SimpleCache::clear($cache_key);
+  SimpleCache::clear(SimpleCache::key('whitelist_dns', $device_id));
   
   json_out(['ok' => true]);
 } else {

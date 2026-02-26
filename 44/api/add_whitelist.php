@@ -50,9 +50,10 @@ try {
   $stmt->bind_param("iss", $device_id, $domain, $comment);
   $stmt->execute();
   
-  // Clear cache for this device
+  // Clear cache for this device (dashboard + DNS server)
   $cache_key = SimpleCache::key('whitelist', $device_id, $user['id']);
   SimpleCache::clear($cache_key);
+  SimpleCache::clear(SimpleCache::key('whitelist_dns', $device_id));
   
   json_out(['status' => 'added', 'id' => $stmt->insert_id], 201);
 } catch (mysqli_sql_exception $e) {

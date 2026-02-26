@@ -5,51 +5,49 @@
  * Works in all languages - detects porn domains automatically
  */
 
-// List of known pornographic domain patterns (works in all languages)
+// List of known pornographic domain patterns (English, French, and more)
 $PORN_DOMAIN_PATTERNS = [
-    // English patterns
+    // English
     'porn', 'xxx', 'sex', 'adult', 'nude', 'naked', 'erotic', 'erotica',
     'hardcore', 'fetish', 'bdsm', 'lesbian', 'gay', 'milf', 'teen',
     'anal', 'oral', 'blowjob', 'cumshot', 'orgasm', 'masturbat',
     'escort', 'hooker', 'prostitute', 'camgirl', 'webcam',
-    
-    // Dutch patterns
-    'porno', 'seks', 'naakt', 'erotisch', 'hardcore', 'fetish',
-    'escort', 'prostituee', 'webcam',
-    
-    // German patterns
-    'porno', 'sex', 'nackt', 'erotisch', 'hardcore', 'fetisch',
-    'escort', 'prostituierte',
-    
-    // French patterns
-    'porno', 'sexe', 'nu', 'érotique', 'hardcore', 'fétichisme',
-    'escorte', 'prostituée',
-    
-    // Spanish patterns
-    'porno', 'sexo', 'desnudo', 'erótico', 'hardcore', 'fetiche',
-    'escort', 'prostituta',
-    
-    // Italian patterns
-    'porno', 'sesso', 'nudo', 'erotico', 'hardcore', 'feticismo',
-    'escort', 'prostituta',
-    
-    // Common porn site domains (comprehensive list)
     'pornhub', 'xvideos', 'xhamster', 'redtube', 'youporn', 'tube8',
     'spankwire', 'keezmovies', 'extremetube', 'sunporno', '4tube',
-    'porn', 'xnxx', 'xvideo', 'pornmd', 'porn300', 'porn555',
-    'chaturbate', 'livejasmin', 'myfreecams', 'cam4', 'streamate',
-    'onlyfans', 'justforfans', 'manyvids', 'onlyfans',
-    // Video streaming/CDN domains (often used for porn videos)
+    'pornmd', 'porn300', 'porn555', 'xnxx', 'xvideo', 'chaturbate',
+    'livejasmin', 'myfreecams', 'cam4', 'streamate', 'onlyfans',
+    'justforfans', 'manyvids', 'fansly', 'fapster', 'eporner',
+    'beeg', 'tnaflix', 'pornone', 'pornrox', 'pornhat', 'pornid',
+    'drtuber', 'nuvid', 'empflix', 'pornicom', 'pornoxo',
     'phncdn', 'phcdn', 'xvcdn', 'xhcdn', 'rtcdn', 'ypcdn',
     'porncdn', 'adultcdn', 'sexcdn', 'xxxcdn',
-    // Additional porn sites
     'brazzers', 'realitykings', 'bangbros', 'naughtyamerica',
     'vixen', 'tushy', 'blacked', 'deeper', 'kink', 'hardx',
-    'amateur', 'milf', 'teen', 'anal', 'lesbian', 'gay',
-    'threesome', 'gangbang', 'rough', 'hardcore',
-    
-    // Additional patterns
-    'nsfw', '18+', 'adult-content', 'mature', 'explicit'
+    'amateur', 'threesome', 'gangbang', 'rough',
+    'nsfw', '18+', 'adult-content', 'mature', 'explicit',
+    'camshow', 'camsite', 'livecam', 'adultcam', 'freecam',
+    'pornstar', 'porn-star', 'adult-video', 'adultvideo',
+    'hentai', 'rule34', 'e621', 'dating-adult', 'hookup',
+    'stripclub', 'strip-club', 'peepshow', 'peep-show',
+    // French
+    'porno', 'sexe', 'nu', 'nue', 'nus', 'nues', 'érotique', 'erotique',
+    'fétichisme', 'fetichisme', 'escorte', 'prostituée', 'prostituee',
+    'sodomie', 'sodom', 'pénis', 'penis', 'vagin', 'seins', 'cul',
+    'pornographique', 'pornographiques', 'adulte', 'adultes',
+    'jacquieetmichel', 'jacquie', 'michel', 'coquin', 'coquine',
+    'video-porno', 'vidéo-porno', 'film-porno', 'film-x', 'video-x', 'vidéo-x',
+    'libertin', 'libertine', 'échangiste', 'echangiste',
+    'rencontre-adulte', 'site-adulte', 'contenu-adulte',
+    // Dutch
+    'porno', 'seks', 'naakt', 'erotisch', 'prostituee',
+    // German
+    'porno', 'nackt', 'erotisch', 'fetisch', 'prostituierte',
+    // Spanish
+    'porno', 'sexo', 'desnudo', 'erótico', 'erotico', 'fetiche', 'prostituta',
+    // Italian
+    'porno', 'sesso', 'nudo', 'erotico', 'feticismo', 'prostituta',
+    // Portuguese
+    'porno', 'sexo', 'nu', 'nua', 'erótico', 'erotico', 'prostituta',
 ];
 
 // Known pornographic TLDs

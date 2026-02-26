@@ -21,6 +21,8 @@ if os.getenv('HTTP_HOST') and 'ja1234.com' in os.getenv('HTTP_HOST', ''):
     API_BASE_URL = "https://ja1234.com/api"  # Production
 else:
     API_BASE_URL = "http://localhost/44/api"  # Development
+# Secret for DNS server to fetch whitelist (set same as PHP env DNS_INTERNAL_KEY)
+DNS_INTERNAL_KEY = os.getenv('DNS_INTERNAL_KEY', '')
 CACHE_TTL = 15  # Cache whitelist for 15 seconds
 VPN_SUBNET = "10.10.0.0/24"
 
@@ -61,11 +63,15 @@ def get_whitelist_for_device(device_id):
             if age < CACHE_TTL:
                 return whitelist_cache[device_id]
     
-    # Fetch from API
+    # Fetch from API (with internal key so DNS server can get whitelist without user auth)
     try:
+        headers = {}
+        if DNS_INTERNAL_KEY:
+            headers['X-DNS-Internal-Key'] = DNS_INTERNAL_KEY
         response = requests.get(
             f"{API_BASE_URL}/get_whitelist.php",
             params={"device_id": device_id},
+            headers=headers,
             timeout=2
         )
         
@@ -93,30 +99,55 @@ def get_whitelist_for_device(device_id):
     return []
 
 
-# Pornographic domain patterns (permanent block - works in all languages)
+# Pornographic domain patterns (permanent block – English, French, and more)
 PORN_PATTERNS = [
+    # --- English ---
     'porn', 'xxx', 'sex', 'adult', 'nude', 'naked', 'erotic', 'erotica',
     'hardcore', 'fetish', 'bdsm', 'lesbian', 'gay', 'milf', 'teen',
     'anal', 'oral', 'blowjob', 'cumshot', 'orgasm', 'masturbat',
     'escort', 'hooker', 'prostitute', 'camgirl', 'webcam',
     'pornhub', 'xvideos', 'xhamster', 'redtube', 'youporn', 'tube8',
     'xnxx', 'chaturbate', 'livejasmin', 'onlyfans',
-    # Video streaming/CDN domains (often used for porn videos)
     'phncdn', 'phcdn', 'xvcdn', 'xhcdn', 'rtcdn', 'ypcdn',
     'porncdn', 'adultcdn', 'sexcdn', 'xxxcdn',
-    # Additional porn sites
     'brazzers', 'realitykings', 'bangbros', 'naughtyamerica',
     'vixen', 'tushy', 'blacked', 'deeper', 'kink', 'hardx',
     'amateur', 'threesome', 'gangbang', 'rough',
-    'porno', 'seks', 'naakt',  # Dutch
-    'porno', 'sex', 'nackt',  # German
-    'porno', 'sexe', 'nu',  # French
-    'porno', 'sexo', 'desnudo',  # Spanish
-    'porno', 'sesso', 'nudo',  # Italian
-    'nsfw', '18+', 'adult-content'
+    'spankwire', 'keezmovies', 'extremetube', 'sunporno', '4tube',
+    'pornmd', 'porn300', 'porn555', 'myfreecams', 'cam4', 'streamate',
+    'justforfans', 'manyvids', 'fansly', 'fapster', 'eporner',
+    'beeg', 'tnaflix', 'pornone', 'pornrox', 'pornhat', 'pornid',
+    'drtuber', 'nuvid', 'empflix', 'pornicom', 'pornoxo',
+    'nsfw', '18+', 'adult-content', 'mature', 'explicit',
+    # --- French ---
+    'porno', 'sexe', 'nu', 'nue', 'nus', 'nues', 'érotique', 'erotique',
+    'hardcore', 'fétichisme', 'fetichisme', 'escorte', 'prostituée', 'prostituee',
+    'sodomie', 'sodom', 'pénis', 'penis', 'vagin', 'seins', 'cul',
+    'pornographique', 'pornographiques', 'adulte', 'adultes',
+    'xhamster', 'youporn', 'redtube', 'pornhub', 'xvideos',
+    'jacquieetmichel', 'jacquie', 'michel', 'coquin', 'coquine',
+    'nu.fr', 'sexe.fr', 'porno.fr', 'video-porno', 'vidéo-porno',
+    'film-porno', 'film-x', 'video-x', 'vidéo-x',
+    'libertin', 'libertine', 'échangiste', 'echangiste',
+    'rencontre-adulte', 'site-adulte', 'contenu-adulte',
+    # --- Dutch ---
+    'porno', 'seks', 'naakt', 'erotisch', 'prostituee',
+    # --- German ---
+    'porno', 'nackt', 'erotisch', 'fetisch', 'prostituierte',
+    # --- Spanish ---
+    'porno', 'sexo', 'desnudo', 'erótico', 'erotico', 'fetiche', 'prostituta',
+    # --- Italian ---
+    'porno', 'sesso', 'nudo', 'erotico', 'feticismo', 'prostituta',
+    # --- Portuguese ---
+    'porno', 'sexo', 'nu', 'nua', 'erótico', 'erotico', 'prostituta',
+    # --- More generic / international ---
+    'camshow', 'camsite', 'livecam', 'adultcam', 'freecam',
+    'pornstar', 'porn-star', 'adult-video', 'adultvideo',
+    'hentai', 'rule34', 'e621', 'furry-porn',
+    'dating-adult', 'hookup', 'one-night-stand',
+    'stripclub', 'strip-club', 'peepshow', 'peep-show',
 ]
-
-PORN_TLDS = ['.xxx', '.adult', '.sex', '.porn']
+PORN_TLDS = ['.xxx', '.adult', '.sex', '.porn', '.porno']
 
 def is_pornographic_domain(domain):
     """Check if domain is pornographic - PERMANENT BLOCK"""

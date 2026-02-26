@@ -1,13 +1,19 @@
 <?php
 /**
  * VPN server settings for WireGuard config generation.
- * Copy to config_vpn.php and set your real values so downloaded configs are ready to use.
+ * Copy to config_vpn.php and set your real values.
  *
- * Get the server public key on the VPN server with:
- *   sudo cat /etc/wireguard/wg0.conf | grep PrivateKey
- *   then run: wg pubkey < privatekey
- * Or from the [Interface] section of your WireGuard server config (PublicKey line).
+ * --- How to get the SERVER public key (on the VPN server machine) ---
+ * 1. SSH to the machine that runs WireGuard (VPN server).
+ * 2. Run:
+ *      wg genkey | tee server_private.key | wg pubkey > server_public.key
+ *      cat server_public.key
+ * 3. Copy the single line (base64) into $VPN_SERVER_PUBLIC_KEY below.
+ *    Keep server_private.key on the VPN server only; use it in /etc/wireguard/wg0.conf [Interface] PrivateKey.
+ *
+ * --- Endpoint ---
+ * Optional: leave VPN_SERVER_ENDPOINT empty to auto-use vpn.<your-domain>:51820 from BASE_URL.
  */
-$VPN_SERVER_ENDPOINT = 'vpn.example.com:51820';   // Your VPN server hostname or IP and port (UDP 51820)
-$VPN_SERVER_PUBLIC_KEY = 'YOUR_SERVERS_PUBLIC_KEY_BASE64';  // WireGuard server public key (base64, one line)
-$VPN_DNS = '10.10.0.1';   // DNS server IP (usually the VPN server's tunnel IP for whitelist DNS)
+$VPN_SERVER_ENDPOINT = 'vpn.example.com:51820';   // Optional: e.g. vpn.ja1234.com:51820 or 1.2.3.4:51820
+$VPN_SERVER_PUBLIC_KEY = 'YOUR_SERVERS_PUBLIC_KEY_BASE64';  // Required: paste output of "cat server_public.key"
+$VPN_DNS = '10.10.0.1';   // DNS server IP (usually VPN server tunnel IP)

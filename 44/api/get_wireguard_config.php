@@ -68,9 +68,30 @@ if ($device['status'] !== 'active') {
 if (file_exists(__DIR__ . '/../config_vpn.php')) {
   require __DIR__ . '/../config_vpn.php';
 }
-$VPN_SERVER_ENDPOINT = $VPN_SERVER_ENDPOINT ?? getenv('VPN_SERVER_ENDPOINT') ?: 'your-vpn-server.com:51820';
-$VPN_SERVER_PUBLIC_KEY = $VPN_SERVER_PUBLIC_KEY ?? getenv('VPN_SERVER_PUBLIC_KEY') ?: 'YOUR_VPN_SERVER_PUBLIC_KEY';
+$VPN_SERVER_ENDPOINT = $VPN_SERVER_ENDPOINT ?? getenv('VPN_SERVER_ENDPOINT');
+$VPN_SERVER_PUBLIC_KEY = $VPN_SERVER_PUBLIC_KEY ?? getenv('VPN_SERVER_PUBLIC_KEY');
 $VPN_DNS = $VPN_DNS ?? getenv('VPN_DNS') ?: '10.10.0.1';
+
+// Auto-derive endpoint from site domain if still placeholder (so config works with minimal setup)
+$placeholder_endpoint = 'your-vpn-server.com:51820';
+$placeholder_key = 'YOUR_VPN_SERVER_PUBLIC_KEY';
+if (empty($VPN_SERVER_ENDPOINT) || $VPN_SERVER_ENDPOINT === $placeholder_endpoint) {
+  $host = '';
+  if (!empty(getenv('BASE_URL')) && preg_match('#^https?://([^/]+)#', getenv('BASE_URL'), $m)) {
+    $host = strtolower(trim($m[1]));
+  }
+  if ($host === '' && !empty($_SERVER['HTTP_HOST'])) {
+    $host = strtolower(trim(explode(':', $_SERVER['HTTP_HOST'])[0]));
+  }
+  if ($host !== '' && $host !== 'localhost' && $host !== '127.0.0.1') {
+    $VPN_SERVER_ENDPOINT = 'vpn.' . $host . ':51820';
+  } else {
+    $VPN_SERVER_ENDPOINT = $placeholder_endpoint;
+  }
+}
+if (empty($VPN_SERVER_PUBLIC_KEY) || $VPN_SERVER_PUBLIC_KEY === $placeholder_key) {
+  $VPN_SERVER_PUBLIC_KEY = $placeholder_key;
+}
 
 // Client IP from device
 $client_ip = $device['wg_ip'];
