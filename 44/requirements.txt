@@ -1,0 +1,2 @@
+# For dns_whitelist_server.py (Python 3)
+requests>=2.25.0

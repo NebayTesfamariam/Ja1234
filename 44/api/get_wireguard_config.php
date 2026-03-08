@@ -65,6 +65,7 @@ if ($device['status'] !== 'active') {
 }
 
 // VPN Server Configuration (set once so downloaded configs are ready — no user editing)
+// You can use config_vpn.php OR environment variables (env-only: no config_vpn.php needed).
 if (file_exists(__DIR__ . '/../config_vpn.php')) {
   require __DIR__ . '/../config_vpn.php';
 }

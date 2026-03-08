@@ -22,7 +22,12 @@ try {
     $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS);
     
     if ($conn->connect_error) {
-        die("❌ Connection failed: " . $conn->connect_error . "\n");
+        echo "❌ Connection failed: " . $conn->connect_error . "\n\n";
+        echo "If MySQL root requires a password, run:\n";
+        echo "  DB_PASS='your_mysql_password' php setup_database.php\n\n";
+        echo "To set or reset root password:\n";
+        echo "  sudo mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password'; FLUSH PRIVILEGES;\"\n";
+        exit(1);
     }
     
     echo "✅ Connected to MySQL\n\n";

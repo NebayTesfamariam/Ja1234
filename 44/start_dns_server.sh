@@ -33,10 +33,19 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-echo "Checking requests library..."
-if ! python3 -c "import requests" 2>/dev/null; then
-    echo "⚠️  requests library not found. Installing..."
-    pip3 install --user requests
+# Use a venv to avoid PEP 668 / --break-system-packages on modern Linux
+VENV_DIR="$SCRIPT_DIR/.venv"
+if [ ! -d "$VENV_DIR" ]; then
+    echo "Creating Python venv in $VENV_DIR..."
+    python3 -m venv "$VENV_DIR"
+    "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/requirements.txt"
+fi
+PYTHON="$VENV_DIR/bin/python3"
+echo "Using Python: $PYTHON"
+
+if ! "$PYTHON" -c "import requests" 2>/dev/null; then
+    echo "⚠️  requests library not found. Installing into venv..."
+    "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/requirements.txt"
 fi
 
 # Create logs directory
@@ -47,7 +56,7 @@ echo "Starting DNS Whitelist Server..."
 echo "⚠️  This requires sudo (admin) privileges for port 53"
 
 # Start in background and log output
-sudo nohup python3 dns_whitelist_server.py > logs/dns_server.log 2>&1 &
+sudo nohup "$PYTHON" dns_whitelist_server.py > logs/dns_server.log 2>&1 &
 DNS_PID=$!
 
 # Wait a moment for server to start
