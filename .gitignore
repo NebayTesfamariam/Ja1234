@@ -32,6 +32,14 @@ phpunit.xml
 .env.local
 .env.*.local
 config_production.php
+config_vpn.php
+
+# Private keys and WireGuard keys (never commit)
+*.key
+*_private.key
+*_private_key*
+server_private.key
+server_public.key
 
 # Logs and runtime
 logs/*.log
